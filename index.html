@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>嵌入式Linux教学资源中心</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', SimHei, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+        }
+        
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+        
+        .intro {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .intro h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .intro p {
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .resources {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .resource-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+        
+        .resource-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .resource-title {
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .resource-desc {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .resource-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 2px solid #f0f0f0;
+            font-size: 0.9em;
+            color: #999;
+        }
+        
+        .btn-view {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        
+        .btn-view:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .stats {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            color: white;
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+        
+        footer {
+            text-align: center;
+            color: white;
+            padding: 30px;
+            margin-top: 50px;
+        }
+        
+        .coming-soon {
+            opacity: 0.6;
+            position: relative;
+        }
+        
+        .coming-soon::after {
+            content: '即将推出';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #FF6B6B;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔧 嵌入式Linux教学资源中心</h1>
+            <p class="subtitle">26年行业经验精心打造 | 面向大学生与嵌入式开发者</p>
+        </header>
+        
+        <div class="intro">
+            <h2>📚 关于本资源库</h2>
+            <p>本资源库由拥有26年嵌入式Linux开发经验的资深工程师创建，旨在为大学生和初学者提供系统、专业的学习资源。</p>
+            <p>所有可视化图表均采用交互式设计，支持PC端和移动端访问，可用于课堂教学、技术分享和自学。</p>
+            <p><strong>特点：</strong>内容全面 | 图文并茂 | 实战导向 | 持续更新</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number">26</div>
+                <div class="stat-label">年行业经验</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">5</div>
+                <div class="stat-label">主题图表</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">100+</div>
+                <div class="stat-label">知识点覆盖</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">∞</div>
+                <div class="stat-label">持续更新</div>
+            </div>
+        </div>
+        
+        <h2 style="color: white; text-align: center; margin: 40px 0 20px;">📖 可用资源</h2>
+        
+        <div class="resources">
+            <a href="embedded_linux_industry.html" class="resource-card">
+                <div class="resource-icon">🏭</div>
+                <div class="resource-title">嵌入式Linux产业链全景图</div>
+                <div class="resource-desc">
+                    包含5个交互式图表，全面展示嵌入式Linux的技术架构、产业链上下游、应用领域、开发流程和生态系统。适合作为课程导论使用。
+                </div>
+                <div class="resource-meta">
+                    <span>📅 2024年12月</span>
+                    <span class="btn-view">查看资源 →</span>
+                </div>
+            </a>
+            
+            <div class="resource-card coming-soon">
+                <div class="resource-icon">💻</div>
+                <div class="resource-title">Linux内核架构详解</div>
+                <div class="resource-desc">
+                    深入解析Linux内核的核心组件：进程管理、内存管理、文件系统、设备驱动模型等，配合源码分析。
+                </div>
+                <div class="resource-meta">
+                    <span>📅 计划中</span>
+                    <span class="btn-view" style="opacity: 0.5;">敬请期待</span>
+                </div>
+            </div>
+            
+            <div class="resource-card coming-soon">
+                <div class="resource-icon">🔌</div>
+                <div class="resource-title">设备驱动开发实战</div>
+                <div class="resource-desc">
+                    字符设备、块设备、网络设备驱动开发全流程，包含I2C、SPI、USB等常用总线驱动案例。
+                </div>
+                <div class="resource-meta">
+                    <span>📅 计划中</span>
+                    <span class="btn-view" style="opacity: 0.5;">敬请期待</span>
+                </div>
+            </div>
+            
+            <div class="resource-card coming-soon">
+                <div class="resource-icon">🚗</div>
+                <div class="resource-title">汽车电子系统案例</div>
+                <div class="resource-desc">
+                    车载信息娱乐系统、ADAS、车联网等汽车电子领域的嵌入式Linux应用实践与技术趋势。
+                </div>
+                <div class="resource-meta">
+                    <span>📅 计划中</span>
+                    <span class="btn-view" style="opacity: 0.5;">敬请期待</span>
+                </div>
+            </div>
+            
+            <div class="resource-card coming-soon">
+                <div class="resource-icon">🛠️</div>
+                <div class="resource-title">开发工具链使用指南</div>
+                <div class="resource-desc">
+                    Yocto、Buildroot、交叉编译、调试工具等嵌入式开发必备工具的详细使用教程。
+                </div>
+                <div class="resource-meta">
+                    <span>📅 计划中</span>
+                    <span class="btn-view" style="opacity: 0.5;">敬请期待</span>
+                </div>
+            </div>
+            
+            <div class="resource-card coming-soon">
+                <div class="resource-icon">🎯</div>
+                <div class="resource-title">实战项目案例库</div>
+                <div class="resource-desc">
+                    从简单到复杂的实战项目，包括智能家居控制器、工业网关、边缘AI设备等完整案例。
+                </div>
+                <div class="resource-meta">
+                    <span>📅 计划中</span>
+                    <span class="btn-view" style="opacity: 0.5;">敬请期待</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="intro" style="margin-top: 50px;">
+            <h2>🎓 适用人群</h2>
+            <p><strong>大学生：</strong>计算机、电子工程、自动化等专业的本科生和研究生</p>
+            <p><strong>初学者：</strong>对嵌入式Linux开发感兴趣的自学者</p>
+            <p><strong>教师：</strong>可用作嵌入式系统课程的教学辅助资料</p>
+            <p><strong>工程师：</strong>需要系统梳理知识体系的在职开发者</p>
+        </div>
+        
+        <div class="intro">
+            <h2>🔗 如何使用</h2>
+            <p><strong>在线访问：</strong>直接通过浏览器访问各个HTML页面，支持PC和移动端</p>
+            <p><strong>离线使用：</strong>下载HTML文件到本地，双击即可在浏览器中打开</p>
+            <p><strong>分享：</strong>复制页面链接分享给同学、同事或学生</p>
+            <p><strong>教学：</strong>投影到大屏幕进行课堂讲解，支持交互式演示</p>
+        </div>
+        
+        <footer>
+            <p>📧 欢迎提出建议和反馈</p>
+            <p style="margin-top: 10px; opacity: 0.8;">本资源库持续更新中 | 最后更新：2024年12月</p>
+            <p style="margin-top: 10px; opacity: 0.8;">Hosted on GitHub Pages | Open Source</p>
+        </footer>
+    </div>
+</body>
+</html>

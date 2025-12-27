@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>嵌入式Linux产业链讲解</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', SimHei, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 12px 24px;
+            background: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        
+        .nav-btn.active {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none;
+        }
+        
+        .chart-container.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .chart-title {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .layer {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .layer-title {
+            font-size: 1.3em;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .item-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+        
+        .item-desc {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .flow-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .flow-item {
+            background: white;
+            border: 3px solid #667eea;
+            padding: 20px 40px;
+            border-radius: 10px;
+            min-width: 300px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .flow-item::after {
+            content: '↓';
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2em;
+            color: #667eea;
+        }
+        
+        .flow-item:last-child::after {
+            content: '';
+        }
+        
+        .ecosystem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .ecosystem-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-top: 4px solid #667eea;
+        }
+        
+        .ecosystem-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .ecosystem-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .ecosystem-card li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .ecosystem-card li:last-child {
+            border-bottom: none;
+        }
+        
+        .value-chain {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .value-stage {
+            flex: 1;
+            min-width: 150px;
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .value-stage::after {
+            content: '→';
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2em;
+            color: #667eea;
+        }
+        
+        .value-stage:last-child::after {
+            content: '';
+        }
+        
+        .legend {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #4CAF50;
+        }
+        
+        .legend-title {
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 嵌入式Linux产业链全景图 🔧</h1>
+        
+        <div class="navigation">
+            <button class="nav-btn active" onclick="showChart(0)">图1: 技术架构</button>
+            <button class="nav-btn" onclick="showChart(1)">图2: 产业链上下游</button>
+            <button class="nav-btn" onclick="showChart(2)">图3: 应用领域</button>
+            <button class="nav-btn" onclick="showChart(3)">图4: 开发流程</button>
+            <button class="nav-btn" onclick="showChart(4)">图5: 生态系统</button>
+        </div>
+        
+        <!-- 图1: 技术架构层次 -->
+        <div class="chart-container active" id="chart0">
+            <h2 class="chart-title">图1: 嵌入式Linux技术架构层次</h2>
+            
+            <div class="layer" style="background: #e8f5e9;">
+                <div class="layer-title">应用层 (Application Layer)</div>
+                <div class="items">
+                    <div class="item">
+                        <div class="item-name">用户应用程序</div>
+                        <div class="item-desc">业务逻辑实现</div>
+                    </div>
+                    <div class="item">
+                        <div class="item-name">GUI应用</div>
+                        <div class="item-desc">Qt, GTK+等</div>
+                    </div>
+                    <div class="item">
+                        <div class="item-name">网络服务</div>
+                        <div class="item-desc">HTTP, MQTT等</div>
+                    </div>
+                    <div class="item">
+                        <div class="item-name">数据处理</div>
+                        <div class="item-desc">AI推理、编解码</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="layer" style="background: #fff3e0;">
+                <div class="layer-title">中间件层 (Middleware Layer)</div>
+                <div class="items">
+                    <div class="item" style="background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);">
+                        <div class="item-name">文件系统</div>
+                        <div class="item-desc">ext4, ubifs等</div>
+                    </div>
+                    <div class="item" style="background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);">
+                        <div class="item-name">网络协议栈</div>
+                        <div class="item-desc">TCP/IP, WiFi</div>
+                    </div>
+                    <div class="item" style="background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);">
+                        <div class="item-name">数据库</div>
+                        <div class="item-desc">SQLite等</div>
+                    </div>
+                    <div class="item" style="background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);">
+                        <div class="item-name">图形系统</div>
+                        <div class="item-desc">X11, Wayland</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="layer" style="background: #e3f2fd;">
+                <div class="layer-title">操作系统层 (OS Layer)</div>
+                <div class="items">
+                    <div class="item" style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);">
+                        <div class="item-name">Linux内核</div>
+                        <div class="item-desc">进程调度、内存管理</div>
+                    </div>
+                    <div class="item" style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);">
+                        <div class="item-name">设备驱动</div>
+                        <div class="item-desc">I2C, SPI, USB等</div>
+                    </div>
+                    <div class="item" style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);">
+                        <div class="item-name">系统调用接口</div>
+                        <div class="item-desc">用户态/内核态桥梁</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="layer" style="background: #fce4ec;">
+                <div class="layer-title">Bootloader层</div>
+                <div class="items">
+                    <div class="item" style="background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%);">
+                        <div class="item-name">U-Boot</div>
+                        <div class="item-desc">系统引导加载</div>
+                    </div>
+                    <div class="item" style="background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%);">
+                        <div class="item-name">Barebox</div>
+                        <div class="item-desc">现代化bootloader</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="layer" style="background: #f3e5f5;">
+                <div class="layer-title">硬件层 (Hardware Layer)</div>
+                <div class="items">
+                    <div class="item" style="background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);">
+                        <div class="item-name">处理器</div>
+                        <div class="item-desc">ARM, RISC-V, x86</div>
+                    </div>
+                    <div class="item" style="background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);">
+                        <div class="item-name">存储器</div>
+                        <div class="item-desc">NAND, eMMC, NOR</div>
+                    </div>
+                    <div class="item" style="background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);">
+                        <div class="item-name">外设接口</div>
+                        <div class="item-desc">GPIO, UART, Ethernet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 图2: 产业链上下游 -->
+        <div class="chart-container" id="chart1">
+            <h2 class="chart-title">图2: 嵌入式Linux产业链上下游关系</h2>
+            
+            <div class="value-chain">
+                <div class="value-stage">
+                    <h3>上游</h3>
+                    <h4>芯片/硬件供应商</h4>
+                    <p>ARM、Intel、AMD、高通、瑞芯微、全志、海思、MTK</p>
+                </div>
+                
+                <div class="value-stage">
+                    <h3>中游</h3>
+                    <h4>系统方案商</h4>
+                    <p>嵌入式板卡厂商、Linux发行版、BSP开发商</p>
+                </div>
+                
+                <div class="value-stage">
+                    <h3>下游</h3>
+                    <h4>终端产品厂商</h4>
+                    <p>消费电子、工控、医疗、汽车、通信设备厂商</p>
+                </div>
+                
+                <div class="value-stage">
+                    <h3>终端</h3>
+                    <h4>最终用户</h4>
+                    <p>企业客户、消费者、政府机构</p>
+                </div>
+            </div>
+            
+            <div class="layer" style="margin-top: 40px; background: #e8f5e9;">
+                <div class="layer-title">核心厂商分类</div>
+                
+                <div class="ecosystem-grid">
+                    <div class="ecosystem-card">
+                        <h3>🔌 芯片厂商</h3>
+                        <ul>
+                            <li><strong>ARM系列:</strong> NXP, TI, STM32, Rockchip</li>
+                            <li><strong>RISC-V:</strong> 平头哥, SiFive, 芯来科技</li>
+                            <li><strong>x86:</strong> Intel Atom系列</li>
+                            <li><strong>国产:</strong> 瑞芯微, 全志, 海思</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="ecosystem-card">
+                        <h3>💻 板卡方案商</h3>
+                        <ul>
+                            <li>树莓派基金会</li>
+                            <li>BeagleBoard.org</li>
+                            <li>研华科技</li>
+                            <li>华北工控</li>
+                            <li>国内各类开发板厂商</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="ecosystem-card">
+                        <h3>🛠️ 工具链提供商</h3>
+                        <ul>
+                            <li><strong>编译器:</strong> GCC, LLVM/Clang</li>
+                            <li><strong>构建系统:</strong> Yocto, Buildroot</li>
+                            <li><strong>调试工具:</strong> GDB, JTAG</li>
+                            <li><strong>IDE:</strong> Eclipse, VSCode</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="ecosystem-card">
+                        <h3>📦 Linux发行版</h3>
+                        <ul>
+                            <li>Debian (Raspberry Pi OS)</li>
+                            <li>Ubuntu Core</li>
+                            <li>OpenWrt (路由器)</li>
+                            <li>Yocto Project</li>
+                            <li>Android (基于Linux)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 图3: 应用领域 -->
+        <div class="chart-container" id="chart2">
+            <h2 class="chart-title">图3: 嵌入式Linux主要应用领域</h2>
+            
+            <div class="ecosystem-grid">
+                <div class="ecosystem-card" style="border-top-color: #FF6B6B;">
+                    <h3>🏭 工业控制</h3>
+                    <ul>
+                        <li>PLC可编程控制器</li>
+                        <li>工业机器人控制系统</li>
+                        <li>数控机床</li>
+                        <li>SCADA系统</li>
+                        <li>工业网关</li>
+                        <li>智能传感器</li>
+                    </ul>
+                </div>
+                
+                <div class="ecosystem-card" style="border-top-color: #4ECDC4;">
+                    <h3>🚗 汽车电子</h3>
+                    <ul>
+                        <li>车载信息娱乐系统(IVI)</li>
+                        <li>ADAS高级驾驶辅助</li>
+                        <li>车载网关</li>
+                        <li>数字仪表盘</li>
+                        <li>T-Box车联网终端</li>
+                        <li>域控制器</li>
+                    </ul>
+                </div>
+                
+                <div class="ecosystem-card" style="border-top-color: #95E1D3;">
+                    <h3>📱 消费电子</h3>
+                    <ul>
+                        <li>智能手机(Android)</li>
+                        <li>智能电视/机顶盒</li>
+                        <li>智能音箱</li>
+                        <li>智能家居中控</li>
+                        <li>可穿戴设备</li>
+                        <li>游戏主机</li>
+                    </ul>
+                </div>
+                
+                <div class="ecosystem-card" style="border-top-color: #F38181;">
+                    <h3>🌐 网络通信</h3>
+                    <ul>
+                        <li>路由器/交换机</li>
+                        <li>5G基站</li>
+                        <li>光通信设备</li>
+                        <li>网络安全设备</li>
+                        <li>工业以太网交换机</li>
+                        <li>边缘计算网关</li>
+                    </ul>
+                </div>
+                
+                <div class="ecosystem-card" style="border-top-color: #AA96DA;">
+                    <h3>🏥 医疗设备</h3>
+                    <ul>
+                        <li>医疗影像设备(CT, MRI)</li>
+                        <li>监护仪</li>
+                        <li>呼吸机</li>
+                        <li>超声诊断仪</li>
+                        <li>便携式医疗设备</li>
+                        <li>实验室分析仪器</li>
+                    </ul>
+                </div>
+                
+                <div class="ecosystem-card" style="border-top-color: #FCBAD3;">
+                    <h3>🛡️ 国防军工</h3>
+                    <ul>
+                        <li>军用通信设备</li>
+                        <li>雷达系统</li>
+                        <li>导航定位系统</li>
+                        <li>无人机控制系统</li>
+                        <li>指挥控制系统</li>
+                        <li>电子对抗设备</li>
+                    </ul>
+                </div>
+                
+                <div class="ecosystem-card" style="border-top-color: #FFFFD2;">
+                    <h3>🏢 智能建筑</h3>
+                    <ul>
+                        <li>楼宇自控系统</li>
+                        <li>智能照明</li>
+                        <li>门禁系统</li>
+                        <li>电梯控制系统</li>
+                        <li>能源管理系统</li>
+                        <li>安防监控</li>
+                    </ul>
+                </div>
+                
+                <div class="ecosystem-card" style="border-top-color: #A8DADC;">
+                    <h3>🔋 能源电力</h3>
+                    <ul>
+                        <li>智能电表</li>
+                        <li>充电桩</li>
+                        <li>光伏逆变器</li>
+                        <li>储能系统BMS</li>
+                        <li>电网监控系统</li>
+                        <li>变电站自动化</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="legend">
+                <div class="legend-title">💡 行业趋势</div>
+                <p><strong>增长最快:</strong> 汽车电子(智能驾驶)、工业互联网、边缘AI计算</p>
+                <p><strong>市场规模最大:</strong> 消费电子、网络通信设备</p>
+                <p><strong>技术要求最高:</strong> 医疗设备、国防军工、汽车安全系统</p>
+            </div>
+        </div>
+        
+        <!-- 图4: 开发流程 -->
+        <div class="chart-container" id="chart3">
+            <h2 class="chart-title">图4: 嵌入式Linux产品开发全流程</h2>
+            
+            <div class="flow-chart">
+                <div class="flow-item" style="background: #FFE5E5;">
+                    <h3>1️⃣ 需求分析与硬件选型</h3>
+                    <p>确定功能需求 → 选择处理器平台 → 评估资源需求(CPU/内存/存储)</p>
+                </div>
+                
+                <div class="flow-item" style="background: #FFF4E5;">
+                    <h3>2️⃣ 硬件设计与制板</h3>
+                    <p>原理图设计 → PCB布局布线 → 样板制作 → 硬件调试</p>
+                </div>
+                
+                <div class="flow-item" style="background: #E5F4FF;">
+                    <h3>3️⃣ Bootloader移植</h3>
+                    <p>U-Boot配置 → 添加板级支持 → 环境变量设置 → 启动参数配置</p>
+                </div>
+                
+                <div class="flow-item" style="background: #F0E5FF;">
+                    <h3>4️⃣ Linux内核裁剪与配置</h3>
+                    <p>下载kernel源码 → menuconfig配置 → 设备树(DTS)编写 → 编译内核</p>
+                </div>
+                
+                <div class="flow-item" style="background: #E5FFE5;">
+                    <h3>5️⃣ 驱动程序开发</h3>
+                    <p>字符设备驱动 → 平台驱动 → I2C/SPI驱动 → 中断处理 → 设备树绑定</p>
+                </div>
+                
+                <div class="flow-item" style="background: #FFE5F4;">
+                    <h3>6️⃣ 根文件系统构建</h3>
+                    <p>Busybox编译 → 系统库集成 → 启动脚本 → 设备节点创建 → init进程配置</p>
+                </div>
+                
+                <div class="flow-item" style="background: #F4FFE5;">
+                    <h3>7️⃣ 应用程序开发</h3>
+                    <p>交叉编译环境搭建 → 业务逻辑实现 → 用户界面开发 → 网络通信</p>
+                </div>
+                
+                <div class="flow-item" style="background: #E5FFFF;">
+                    <h3>8️⃣ 系统集成与测试</h3>
+                    <p>功能测试 → 性能优化 → 稳定性测试 → 安全加固</p>
+                </div>
+                
+                <div class="flow-item" style="background: #FFE5E5;">
+                    <h3>9️⃣ 量产与维护</h3>
+                    <p>固件打包 → 批量烧录 → OTA升级机制 → 售后技术支持</p>
+                </div>
+            </div>
+            
+            <div class="legend" style="margin-top: 40px;">
+                <div class="legend-title">⏱️ 典型项目周期</div>
+                <p><strong>小型项目:</strong> 3-6个月 (基于成熟平台)</p>
+                <p><strong>中型项目:</strong> 6-12个月 (需要定制硬件)</p>
+                <p><strong>大型项目:</strong> 12-24个月 (全新平台或复杂系统)</p>
+            </div>
+        </div>
+        
+        <!-- 图5: 生态系统 -->
+        <div class="chart-container" id="chart4">
+            <h2 class="chart-title">图5: 嵌入式Linux开发生态系统</h2>
+            
+            <div class="layer" style="background: #E3F2FD;">
+                <div class="layer-title">🛠️ 开发工具链</div>
+                <div class="ecosystem-grid">
+                    <div class="ecosystem-card">
+                        <h3>交叉编译工具</h3>
+                        <ul>
+                            <li>ARM GCC</li>
+                            <li>Linaro工具链</li>
+                            <li>Buildroot工具链</li>
+                            <li>Yocto SDK</li>
+                        </ul>
+                    </div>
+                    <div class="ecosystem-card">
+                        <h3>构建系统</h3>
+                        <ul>
+                            <li>Yocto Project</li>
+                            <li>Buildroot</li>
+                            <li>OpenWrt</li>
+                            <li>PTXdist</li>
+                        </ul>
+                    </div>
+                    <div class="ecosystem-card">
+                        <h3>调试工具</h3>
+                        <ul>
+                            <li>GDB + gdbserver</li>
+                            <li>JTAG调试器</li>
+                            <li>strace系统跟踪</li>
+                            <li>perf性能分析</li>
+                        </ul>
+                    </div>
+                    <div class="ecosystem-card">
+                        <h3>开发环境</h3>
+                        <ul>
+                            <li>Eclipse + CDT</li>
+                            <li>VSCode</li>
+                            <li>Qt Creator</li>
+                            <li>Vim/Emacs</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="layer" style="background: #F3E5F5; margin-top: 30px;">
+                <div class="layer-title">📚 关键技术组件</div>
+                <div class="ecosystem-grid">
+                    <div class="ecosystem-card">
+                        <h3>通信协议</h3>
+                        <ul>
+                            <li>MQTT, CoAP</li>
+                            <li>Modbus, CAN</li>
+                            <li>Bluetooth, ZigBee</li>
+                            <li>LoRa, NB-IoT</li>
+                        </ul>
+                    </div>
+                    <div class="ecosystem-card">
+                        <h3>图形界面</h3>
+                        <ul>
+                            <li>Qt/QML</li>
+                            <li>GTK+</li>
+                            <li>LVGL</li>
+                            <li>DirectFB</li>
+                        </ul>
+                    </div>
+                    <div class="ecosystem-card">
+                        <h3>实时性扩展</h3>
+                        <ul>
+                            <li>PREEMPT_RT补丁</li>
+                            <li>Xenomai</li>
+                            <li>RTAI</li>
+                        </ul>
+                    </div>
+                    <div class="ecosystem-card">
+                        <h3>AI/机器学习</h3>
+                        <ul>
+                            <li>TensorFlow Lite</li>
+                            <li>NCNN</li>
+                            <li>OpenCV</li>
+                            <li>ONNX Runtime</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="layer" style="background: #FFF3E0; margin-top: 30px;">
+                <div class="layer-title">🎓 学习资源与社区</div>
+                <div class="ecosystem-grid">
+                    <div class="ecosystem-card">
+                        <h3>官方文档</h3>
+                        <ul>
+                            <li>kernel.org</li>
+                            <li>Yocto Project文档</li>
+                            <li>Buildroot手册</li>
+                            <li>各芯片厂商技术手册</li>
+                        </ul>
+                    </div>
+                    <div class="ecosystem-card">
+                        <h3>开源社区</h3>
+                        <ul>
+                            <li>Linux Kernel邮件列表</li>
+                            <li>Embedded Linux Wiki</li>
+                            <li>Stack Overflow</li>
+                            <li>GitHub开源项目</li>
+                        </ul>
+                    </div>
+                    <div class="ecosystem-card">
+                        <h3>培训认证</h3>
+                        <ul>
+                            <li>Linux基金会认证</li>
+                            <li>Yocto培训</li>
+                            <li>各大高校课程</li>
+                            <li>在线学习平台</li>
+                        </ul>
+                    </div>
+                    <div class="ecosystem-card">
+                        <h3>行业会议</h3>
+                        <ul>
+                            <li>Embedded Linux Conference</li>
+                            <li>Linux Plumbers Conference</li>
+                            <li>国内各类技术峰会</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="legend" style="margin-top: 30px;">
+                <div class="legend-title">🌟 给大一学生的建议</div>
+                <p><strong>基础知识:</strong> 扎实掌握C语言、数据结构、操作系统原理、计算机组成原理</p>
+                <p><strong>实践路径:</strong> 从树莓派/开发板入门 → 学习Linux命令 → 尝试编译内核 → 编写简单驱动 → 完成小项目</p>
+                <p><strong>职业方向:</strong> 驱动开发工程师、BSP工程师、系统架构师、应用开发工程师</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showChart(index) {
+            // 隐藏所有图表
+            const charts = document.querySelectorAll('.chart-container');
+            charts.forEach(chart => chart.classList.remove('active'));
+            
+            // 移除所有按钮的激活状态
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // 显示选中的图表
+            document.getElementById(`chart${index}`).classList.add('active');
+            buttons[index].classList.add('active');
+        }
+    </script>
+</body>
+</html>
