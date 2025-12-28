@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第2讲:Linux文件系统与基本命令 - 互动学习</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2d6a4f 0%, #40916c 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        nav {
+            background: #f8f9fa;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #2d6a4f;
+            padding: 10px 20px;
+            border-radius: 25px;
+            background: white;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        nav a:hover {
+            background: #2d6a4f;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        section {
+            margin-bottom: 60px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #2d6a4f;
+        }
+
+        h2 {
+            color: #2d6a4f;
+            font-size: 2em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        h3 {
+            color: #40916c;
+            font-size: 1.5em;
+            margin: 25px 0 15px 0;
+        }
+
+        .emoji {
+            font-size: 1.3em;
+        }
+
+        .tree-demo {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            line-height: 1.8;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+
+        .tree-demo .root {
+            color: #e63946;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .tree-demo .dir {
+            color: #2d6a4f;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tree-demo .dir:hover {
+            color: #40916c;
+            text-decoration: underline;
+        }
+
+        .command-box {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .command-box::before {
+            content: '$ ';
+            color: #00ff00;
+        }
+
+        .interactive-terminal {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 25px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            min-height: 300px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .interactive-terminal input {
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            width: 80%;
+            outline: none;
+        }
+
+        .terminal-output {
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+
+        .prompt {
+            color: #00ff00;
+            font-weight: bold;
+        }
+
+        .quiz-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .quiz-question {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quiz-option {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .quiz-option:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateX(10px);
+        }
+
+        .quiz-option.correct {
+            background: #2ecc71;
+            animation: bounce 0.5s;
+        }
+
+        .quiz-option.wrong {
+            background: #e74c3c;
+            animation: shake 0.5s;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #f4a261;
+        }
+
+        .info-card strong {
+            color: #e76f51;
+        }
+
+        .command-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .command-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+            border-top: 4px solid #40916c;
+        }
+
+        .command-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .command-name {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5em;
+            color: #2d6a4f;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .command-desc {
+            color: #555;
+            margin-bottom: 12px;
+        }
+
+        .command-example {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #2d6a4f;
+        }
+
+        .path-demo {
+            display: flex;
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .path-card {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .path-absolute {
+            border-top: 4px solid #2d6a4f;
+        }
+
+        .path-relative {
+            border-top: 4px solid #f4a261;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .warning-box strong {
+            color: #e63946;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .practice-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .practice-section h3 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .practice-task {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        button {
+            background: #2d6a4f;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            background: #40916c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        footer {
+            background: #2d6a4f;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            text-decoration: underline dotted;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌲 Linux文件系统与基本命令</h1>
+            <p>第2讲 - 互动式学习体验</p>
+            <p style="font-size: 0.9em; margin-top: 10px; opacity: 0.8;">嵌入式Linux基础课程</p>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="#philosophy">一切皆文件</a></li>
+                <li><a href="#tree">文件树结构</a></li>
+                <li><a href="#directories">重要目录</a></li>
+                <li><a href="#paths">路径概念</a></li>
+                <li><a href="#commands">基本命令</a></li>
+                <li><a href="#practice">实战练习</a></li>
+                <li><a href="#quiz">互动测验</a></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <!-- 第一部分:Linux哲学 -->
+            <section id="philosophy" class="slide-in">
+                <h2><span class="emoji">💡</span>Linux哲学:一切皆文件</h2>
+                
+                <div class="info-card">
+                    <p style="font-size: 1.2em; margin-bottom: 15px;">
+                        <strong>核心理念:</strong> 在Linux中,<strong>一切都是文件</strong>!
+                    </p>
+                    <p>不仅你的文档、图片是文件,就连硬盘、键盘、显示器、网络连接...都被抽象为文件!</p>
+                </div>
+
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div style="font-size: 2.5em; text-align: center; margin-bottom: 10px;">📄</div>
+                        <div class="command-name">普通文件</div>
+                        <div class="command-desc">文本、图片、程序、视频等你常见的文件</div>
+                        <div class="command-example">example.txt, photo.jpg, app.bin</div>
+                    </div>
+
+                    <div class="command-card">
+                        <div style="font-size: 2.5em; text-align: center; margin-bottom: 10px;">📁</div>
+                        <div class="command-name">目录文件</div>
+                        <div class="command-desc">文件夹也是一种特殊的文件!</div>
+                        <div class="command-example">/home, /etc, Documents/</div>
+                    </div>
+
+                    <div class="command-card">
+                        <div style="font-size: 2.5em; text-align: center; margin-bottom: 10px;">⚙️</div>
+                        <div class="command-name">设备文件</div>
+                        <div class="command-desc">硬盘、USB、键盘等硬件设备</div>
+                        <div class="command-example">/dev/sda (硬盘), /dev/usb</div>
+                    </div>
+                </div>
+
+                <div class="quiz-box">
+                    <div class="quiz-question">🤔 互动思考:如果键盘是一个文件,那么"读取"这个文件会发生什么?</div>
+                    <button onclick="showAnswer('keyboard')">点击查看答案</button>
+                    <div id="keyboard" class="hidden" style="margin-top: 15px; background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                        <strong>答案:</strong> 读取键盘文件 = 获取用户的按键输入!<br/>
+                        比如 <code>cat /dev/input/keyboard</code> 会读取键盘输入的内容。<br/>
+                        这就是"一切皆文件"的强大之处 - 统一的接口!
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <p><strong>💭 为什么这样设计?</strong></p>
+                    <p>统一的文件接口让操作更简单!读写文件的方式,也可以用来读写硬盘、网络。这就是Unix哲学的优雅之处 - 简单、统一、强大!</p>
+                </div>
+            </section>
+
+            <!-- 第二部分:文件树结构 -->
+            <section id="tree">
+                <h2><span class="emoji">🌳</span>文件系统的树状结构</h2>
+                
+                <div class="info-card">
+                    <p><strong>重要概念:</strong> Linux文件系统像一棵倒挂的树,根目录 <code>/</code> 是树根,其他所有文件和目录都从这里生长出来!</p>
+                </div>
+
+                <div class="tree-demo">
+<span class="root">/ (根目录 - Root Directory)</span>
+│
+├── <span class="dir" onclick="highlightPath('home')">home/</span> ← 用户主目录 🏠
+│   ├── alice/
+│   │   ├── Documents/
+│   │   ├── Downloads/
+│   │   └── Pictures/
+│   └── bob/
+│
+├── <span class="dir" onclick="highlightPath('etc')">etc/</span> ← 配置文件 ⚙️
+│   ├── passwd
+│   ├── hostname
+│   └── ssh/
+│
+├── <span class="dir" onclick="highlightPath('usr')">usr/</span> ← 用户程序 📦
+│   ├── bin/
+│   ├── lib/
+│   └── share/
+│
+├── <span class="dir" onclick="highlightPath('bin')">bin/</span> ← 基本命令 🔧
+│   ├── ls
+│   ├── cp
+│   └── mv
+│
+├── <span class="dir" onclick="highlightPath('var')">var/</span> ← 可变数据 📊
+│   ├── log/
+│   └── cache/
+│
+└── <span class="dir" onclick="highlightPath('tmp')">tmp/</span> ← 临时文件 🗑️
+                </div>
+
+                <div class="info-card">
+                    <p><strong>🪟 与Windows的区别:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Windows有多个根: C:\, D:\, E:\ ...</li>
+                        <li>Linux只有一个根: / (所有设备都挂载在这棵树上)</li>
+                        <li>Linux使用 <code>/</code> 分隔目录,Windows使用 <code>\</code></li>
+                    </ul>
+                </div>
+
+                <div id="pathHighlight" class="hidden info-card" style="background: #d4edda; border-color: #28a745;">
+                    <p id="pathInfo"></p>
+                </div>
+            </section>
+
+            <!-- 第三部分:重要目录 -->
+            <section id="directories">
+                <h2><span class="emoji">📍</span>重要目录导游图</h2>
+
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🏠</div>
+                        <div class="command-name">/home</div>
+                        <div class="command-desc">用户的家目录</div>
+                        <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                            每个用户都有自己的子目录,比如 /home/alice<br/>
+                            就像公寓楼里的各个房间!
+                        </p>
+                    </div>
+
+                    <div class="command-card">
+                        <div style="font-size: 2em; margin-bottom: 10px;">⚙️</div>
+                        <div class="command-name">/etc</div>
+                        <div class="command-desc">配置文件中心</div>
+                        <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                            系统和应用的配置文件都在这里<br/>
+                            etc = "et cetera" (拉丁文:等等)
+                        </p>
+                    </div>
+
+                    <div class="command-card">
+                        <div style="font-size: 2em; margin-bottom: 10px;">📦</div>
+                        <div class="command-name">/usr</div>
+                        <div class="command-desc">用户程序</div>
+                        <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                            用户安装的程序和库<br/>
+                            相当于Windows的Program Files
+                        </p>
+                    </div>
+
+                    <div class="command-card">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🔧</div>
+                        <div class="command-name">/bin</div>
+                        <div class="command-desc">基本命令</div>
+                        <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                            ls、cp、mv等基本命令都在这里<br/>
+                            bin = binary (二进制可执行文件)
+                        </p>
+                    </div>
+
+                    <div class="command-card">
+                        <div style="font-size: 2em; margin-bottom: 10px;">📊</div>
+                        <div class="command-name">/var</div>
+                        <div class="command-desc">可变数据</div>
+                        <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                            日志、缓存等经常变化的文件<br/>
+                            var = variable (可变的)
+                        </p>
+                    </div>
+
+                    <div class="command-card">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🗑️</div>
+                        <div class="command-name">/tmp</div>
+                        <div class="command-desc">临时文件</div>
+                        <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                            临时文件,重启会被清空!<br/>
+                            不要在这里存重要文件
+                        </p>
+                    </div>
+                </div>
+
+                <div class="quiz-box">
+                    <div class="quiz-question">🎯 小测验:你的个人照片应该放在哪个目录?</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">A. /tmp (临时文件)</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">B. /etc (配置文件)</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, true)">C. /home/你的用户名 (用户主目录)</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">D. /bin (系统命令)</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第四部分:路径概念 -->
+            <section id="paths">
+                <h2><span class="emoji">🗺️</span>路径:如何找到文件的家?</h2>
+
+                <div class="path-demo">
+                    <div class="path-card path-absolute">
+                        <h3 style="color: #2d6a4f; margin-top: 0;">🗺️ 绝对路径</h3>
+                        <p style="margin-bottom: 15px;">从根目录 <code>/</code> 开始的完整地址</p>
+                        <div class="command-box" style="font-size: 14px;">
+/home/alice/Documents/report.pdf
+                        </div>
+                        <p style="margin-top: 15px; color: #666;">
+                            ✓ 就像完整的邮政地址:国家→省→市→街道→门牌号<br/>
+                            ✓ 无论你在哪里,这个路径都指向同一个文件
+                        </p>
+                    </div>
+
+                    <div class="path-card path-relative">
+                        <h3 style="color: #f4a261; margin-top: 0;">🧭 相对路径</h3>
+                        <p style="margin-bottom: 15px;">从当前位置开始的相对地址</p>
+                        <div class="command-box" style="font-size: 14px;">
+Documents/report.pdf
+                        </div>
+                        <p style="margin-top: 15px; color: #666;">
+                            ✓ 就像说"隔壁楼203室",基于你现在的位置<br/>
+                            ✓ 如果你在 /home/alice,这个路径才有效
+                        </p>
+                    </div>
+                </div>
+
+                <h3>📍 特殊路径符号</h3>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div class="command-name">.</div>
+                        <div class="command-desc">当前目录</div>
+                        <div class="command-example">./script.sh (当前目录的脚本)</div>
+                    </div>
+
+                    <div class="command-card">
+                        <div class="command-name">..</div>
+                        <div class="command-desc">上一级目录</div>
+                        <div class="command-example">cd .. (返回上一级)</div>
+                    </div>
+
+                    <div class="command-card">
+                        <div class="command-name">~</div>
+                        <div class="command-desc">当前用户主目录</div>
+                        <div class="command-example">cd ~ (回到家目录)</div>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <p><strong>💡 实战场景:</strong></p>
+                    <p>假设你当前在 <code>/home/alice</code></p>
+                    <div style="margin-top: 15px; font-family: 'Courier New', monospace;">
+                        <div>cd Documents &nbsp;&nbsp;&nbsp; # 相对路径</div>
+                        <div>cd /home/alice/Documents &nbsp; # 绝对路径</div>
+                        <div style="margin-top: 10px; color: #28a745;">效果完全相同! ✓</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第五部分:基本命令 -->
+            <section id="commands">
+                <h2><span class="emoji">⌨️</span>基本命令:你的Linux工具箱</h2>
+
+                <h3>👀 浏览与定位命令</h3>
+                <div class="command-grid">
+                    <div class="command-card" onclick="showCommandDemo('ls')">
+                        <div style="font-size: 2em; margin-bottom: 10px;">👁️</div>
+                        <div class="command-name">ls</div>
+                        <div class="command-desc">列出目录内容 (list)</div>
+                        <div class="command-example">
+                            ls -la &nbsp; # -l 详细信息 -a 显示隐藏文件
+                        </div>
+                    </div>
+
+                    <div class="command-card" onclick="showCommandDemo('pwd')">
+                        <div style="font-size: 2em; margin-bottom: 10px;">📍</div>
+                        <div class="command-name">pwd</div>
+                        <div class="command-desc">显示当前位置</div>
+                        <div class="command-example">
+                            pwd &nbsp; # 迷路了?看看你在哪!
+                        </div>
+                    </div>
+
+                    <div class="command-card" onclick="showCommandDemo('cd')">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🚶</div>
+                        <div class="command-name">cd</div>
+                        <div class="command-desc">切换目录 (change directory)</div>
+                        <div class="command-example">
+                            cd /home &nbsp; # cd .. 返回上级 cd ~ 回家
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 30px;">🛠️ 文件操作命令</h3>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div style="font-size: 2em; margin-bottom: 10px;">📁</div>
+                        <div class="command-name">mkdir</div>
+                        <div class="command-desc">创建目录 (make directory)</div>
+                        <div class="command-example">
+                            mkdir my_project &nbsp; # -p 创建多层
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <div style="font-size: 2em; margin-bottom: 10px;">📄</div>
+                        <div class="command-name">cp</div>
+                        <div class="command-desc">复制文件/目录 (copy)</div>
+                        <div class="command-example">
+                            cp src.txt dst.txt &nbsp; # -r 复制目录
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <div style="font-size: 2em; margin-bottom: 10px;">✂️</div>
+                        <div class="command-name">mv</div>
+                        <div class="command-desc">移动/重命名 (move)</div>
+                        <div class="command-example">
+                            mv old.txt new.txt
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🗑️</div>
+                        <div class="command-name">rm</div>
+                        <div class="command-desc">删除文件 (remove)</div>
+                        <div class="command-example">
+                            rm file.txt &nbsp; # ⚠️ 无法恢复!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <p style="font-size: 1.2em; margin-bottom: 10px;">
+                        <strong>⚠️ 重要警告:Linux没有回收站!</strong>
+                    </p>
+                    <div style="font-family: 'Courier New', monospace; background: white; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                        <p style="color: #e63946; font-weight: bold;">rm -rf /  # 删除整个系统!!!</p>
+                        <p style="color: #e63946; font-weight: bold;">rm -rf ~  # 删除你的所有文件!!!</p>
+                    </div>
+                    <p><strong>-r</strong> 递归删除 + <strong>-f</strong> 强制执行 = 毁灭性组合!</p>
+                    <p style="margin-top: 10px;">删除前<strong>必须三思</strong>!建议删除前先用 <code>ls</code> 确认路径正确!</p>
+                </div>
+
+                <div class="info-card">
+                    <p><strong>💡 专业技巧:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Tab补全:</strong> 输入文件名时按Tab键自动补全</li>
+                        <li><strong>↑↓箭头:</strong> 查看历史命令</li>
+                        <li><strong>Ctrl+C:</strong> 取消当前命令</li>
+                        <li><strong>Ctrl+L:</strong> 清屏</li>
+                        <li><strong>man 命令:</strong> 查看命令手册 (如 man ls)</li>
+                    </ul>
+                </div>
+
+                <div id="commandDemo" class="hidden interactive-terminal">
+                    <div id="demoOutput"></div>
+                </div>
+            </section>
+
+            <!-- 第六部分:实战练习 -->
+            <section id="practice">
+                <h2><span class="emoji">🎯</span>实战练习:动手做才能学会!</h2>
+
+                <div class="practice-section">
+                    <h3>🏗️ 任务:创建一个网站项目结构</h3>
+                    
+                    <div class="practice-task">
+                        <p><strong>目标结构:</strong></p>
+                        <pre style="margin: 10px 0; font-family: 'Courier New', monospace; line-height: 1.6;">
+my_website/
+├── index.html
+├── css/
+│   └── style.css
+├── js/
+│   └── app.js
+└── images/
+                        </pre>
+                    </div>
+
+                    <div class="practice-task">
+                        <p><strong>步骤清单:</strong></p>
+                        <ol style="margin-left: 20px; margin-top: 10px;">
+                            <li>回到家目录: <code>cd ~</code></li>
+                            <li>创建项目目录: <code>mkdir my_website</code></li>
+                            <li>进入目录: <code>cd my_website</code></li>
+                            <li>创建子目录: <code>mkdir css js images</code></li>
+                            <li>创建文件: <code>touch index.html css/style.css js/app.js</code></li>
+                            <li>查看结果: <code>ls -R</code></li>
+                        </ol>
+                    </div>
+
+                    <button onclick="showPracticeSolution()">查看完整命令</button>
+                    <div id="practiceSolution" class="hidden" style="margin-top: 15px;">
+                        <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; font-family: 'Courier New', monospace;">
+cd ~<br/>
+mkdir my_website<br/>
+cd my_website<br/>
+mkdir css js images<br/>
+touch index.html<br/>
+touch css/style.css<br/>
+touch js/app.js<br/>
+ls -R
+                        </div>
+                    </div>
+                </div>
+
+                <div class="practice-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h3>🎮 挑战关卡</h3>
+                    <div class="practice-task">
+                        <p><strong>Level 1:</strong> 把 images 目录改名为 pics</p>
+                        <button onclick="showHint('hint1')">提示</button>
+                        <div id="hint1" class="hidden" style="margin-top: 10px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
+                            使用 mv 命令: <code>mv images pics</code>
+                        </div>
+                    </div>
+
+                    <div class="practice-task">
+                        <p><strong>Level 2:</strong> 在 css 目录下创建一个 backup 文件夹,并复制 style.css 进去</p>
+                        <button onclick="showHint('hint2')">提示</button>
+                        <div id="hint2" class="hidden" style="margin-top: 10px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
+                            <code>mkdir css/backup</code><br/>
+                            <code>cp css/style.css css/backup/</code>
+                        </div>
+                    </div>
+
+                    <div class="practice-task">
+                        <p><strong>Level 3:</strong> 删除整个 my_website 项目(清理练习环境)</p>
+                        <button onclick="showHint('hint3')">提示</button>
+                        <div id="hint3" class="hidden" style="margin-top: 10px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
+                            先退出项目: <code>cd ~</code><br/>
+                            再删除: <code>rm -rf my_website</code><br/>
+                            <strong style="color: #ffd23f;">⚠️ 注意:确认路径正确再执行!</strong>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第七部分:互动测验 -->
+            <section id="quiz">
+                <h2><span class="emoji">🎓</span>知识检测:看看你掌握了多少?</h2>
+
+                <div class="quiz-box">
+                    <div class="quiz-question">问题 1: 在Linux中,以下哪个不是文件?</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">A. 硬盘设备 /dev/sda</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">B. 目录 /home</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">C. 所有东西都是文件!</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">D. 网络接口</div>
+                    </div>
+                </div>
+
+                <div class="quiz-box">
+                    <div class="quiz-question">问题 2: 以下哪个是绝对路径?</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">A. Documents/file.txt</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">B. /home/alice/file.txt</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">C. ../file.txt</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">D. ~/file.txt</div>
+                    </div>
+                </div>
+
+                <div class="quiz-box">
+                    <div class="quiz-question">问题 3: 要复制整个目录,应该使用什么命令?</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">A. cp folder1 folder2</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">B. cp -r folder1 folder2</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">C. mv folder1 folder2</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">D. mkdir folder2; cp folder1/* folder2/</div>
+                    </div>
+                </div>
+
+                <div class="quiz-box">
+                    <div class="quiz-question">问题 4: 以下哪个符号代表"当前目录的上一级"?</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">A. .</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">B. ..</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">C. ~</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">D. /</div>
+                    </div>
+                </div>
+
+                <div class="quiz-box">
+                    <div class="quiz-question">问题 5: 用户配置文件一般存放在哪个目录?</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">A. /bin</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">B. /etc</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">C. /tmp</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">D. /usr</div>
+                    </div>
+                </div>
+
+                <div id="quizScore" class="hidden success-box" style="margin-top: 30px; text-align: center; font-size: 1.5em;">
+                    <p>🎉 恭喜完成所有测验!</p>
+                    <p style="font-size: 1.2em; margin-top: 15px;">继续加油,实践出真知!</p>
+                </div>
+            </section>
+
+            <!-- 课后总结 -->
+            <section>
+                <h2><span class="emoji">📝</span>课后作业</h2>
+                
+                <div class="info-card">
+                    <h3 style="margin-top: 0;">必做作业:</h3>
+                    <ol style="margin-left: 20px;">
+                        <li>在你的home目录下创建一个 <code>learning</code> 文件夹</li>
+                        <li>在里面创建 <code>week1</code>、<code>week2</code>、<code>week3</code> 三个子目录</li>
+                        <li>在 week1 中创建一个 <code>notes.txt</code> 文件</li>
+                        <li>用 <code>ls -R</code> 命令展示你的目录结构</li>
+                        <li>尝试用绝对路径和相对路径分别访问 week2</li>
+                    </ol>
+                </div>
+
+                <div class="info-card" style="border-color: #667eea;">
+                    <h3 style="margin-top: 0; color: #667eea;">选做挑战:</h3>
+                    <ol style="margin-left: 20px;">
+                        <li>探索 <code>/usr/bin</code> 目录,看看有哪些命令</li>
+                        <li>使用 <code>man ls</code> 学习 ls 命令的其他参数</li>
+                        <li>尝试使用 <code>tree</code> 命令(可能需要先安装)</li>
+                        <li>思考:为什么说"一切皆文件"是Linux的核心哲学?</li>
+                    </ol>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <h3 style="margin-bottom: 15px;">下节课预告</h3>
+            <p style="font-size: 1.1em;">文件操作进阶:权限管理、文本查看与编辑</p>
+            <p style="margin-top: 20px; opacity: 0.8;">💡 记住:实践是学习Linux的最佳方式!</p>
+            <p style="margin-top: 15px; font-size: 0.9em;">Keep Learning, Keep Growing! 🌱</p>
+        </footer>
+    </div>
+
+    <script>
+        // 显示答案
+        function showAnswer(id) {
+            const element = document.getElementById(id);
+            element.classList.toggle('hidden');
+        }
+
+        // 检查答案
+        function checkAnswer(element, isCorrect) {
+            // 移除所有选项的样式
+            const options = element.parentElement.children;
+            for (let option of options) {
+                option.classList.remove('correct', 'wrong');
+            }
+
+            // 添加正确或错误样式
+            if (isCorrect) {
+                element.classList.add('correct');
+                setTimeout(() => {
+                    alert('✅ 正确!个人文件应该放在 /home/你的用户名 目录下!');
+                }, 300);
+            } else {
+                element.classList.add('wrong');
+                setTimeout(() => {
+                    alert('❌ 再想想!个人文件应该放在用户的家目录哦~');
+                }, 300);
+            }
+        }
+
+        // 高亮路径
+        function highlightPath(dir) {
+            const info = {
+                'home': '🏠 /home - 用户主目录,每个用户都有自己的空间,存放个人文件',
+                'etc': '⚙️ /etc - 系统配置文件,如网络设置、用户密码等',
+                'usr': '📦 /usr - 用户程序和库,类似Windows的Program Files',
+                'bin': '🔧 /bin - 基本命令,如ls、cp、mv等',
+                'var': '📊 /var - 可变数据,如日志文件、缓存等',
+                'tmp': '🗑️ /tmp - 临时文件,重启后会被清空'
+            };
+
+            const highlight = document.getElementById('pathHighlight');
+            const pathInfo = document.getElementById('pathInfo');
+            
+            pathInfo.textContent = info[dir];
+            highlight.classList.remove('hidden');
+            
+            // 滚动到提示位置
+            highlight.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // 显示命令演示
+        function showCommandDemo(cmd) {
+            const demos = {
+                'ls': `$ ls
+Documents  Downloads  Pictures  Videos
+$ ls -l
+total 16
+drwxr-xr-x 2 user user 4096 Dec 28 10:00 Documents
+drwxr-xr-x 2 user user 4096 Dec 28 10:00 Downloads
+drwxr-xr-x 2 user user 4096 Dec 28 10:00 Pictures
+drwxr-xr-x 2 user user 4096 Dec 28 10:00 Videos`,
+                'pwd': `$ pwd
+/home/alice
+$ cd /etc
+$ pwd
+/etc`,
+                'cd': `$ pwd
+/home/alice
+$ cd Documents
+$ pwd
+/home/alice/Documents
+$ cd ..
+$ pwd
+/home/alice`
+            };
+
+            const demo = document.getElementById('commandDemo');
+            const output = document.getElementById('demoOutput');
+            
+            output.innerHTML = '<div class="terminal-output">' + demos[cmd] + '</div>';
+            demo.classList.remove('hidden');
+            
+            demo.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // 显示提示
+        function showHint(id) {
+            document.getElementById(id).classList.toggle('hidden');
+        }
+
+        // 显示练习答案
+        function showPracticeSolution() {
+            document.getElementById('practiceSolution').classList.toggle('hidden');
+        }
+
+        // 测验计分
+        let quizAnswered = 0;
+        let quizCorrect = 0;
+
+        function checkQuiz(element, isCorrect) {
+            // 如果这道题已经回答过,不再计分
+            if (element.classList.contains('correct') || element.classList.contains('wrong')) {
+                return;
+            }
+
+            quizAnswered++;
+
+            if (isCorrect) {
+                element.classList.add('correct');
+                quizCorrect++;
+                setTimeout(() => {
+                    alert('✅ 回答正确!');
+                }, 300);
+            } else {
+                element.classList.add('wrong');
+                setTimeout(() => {
+                    alert('❌ 这个答案不对哦,再想想!');
+                }, 300);
+            }
+
+            // 如果所有题目都答完了
+            if (quizAnswered >= 5) {
+                setTimeout(() => {
+                    const scoreDiv = document.getElementById('quizScore');
+                    scoreDiv.innerHTML = `
+                        <p>🎉 测验完成!</p>
+                        <p style="font-size: 1.5em; margin-top: 15px;">你答对了 ${quizCorrect}/5 题</p>
+                        <p style="font-size: 1em; margin-top: 10px;">
+                            ${quizCorrect === 5 ? '完美!你已经掌握了基础知识!' : 
+                              quizCorrect >= 3 ? '不错!继续加油!' : 
+                              '需要多加练习哦~'}
+                        </p>
+                    `;
+                    scoreDiv.classList.remove('hidden');
+                    scoreDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 500);
+            }
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // 页面加载动画
+        window.addEventListener('load', () => {
+            const sections = document.querySelectorAll('section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('slide-in');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            sections.forEach(section => observer.observe(section));
+        });
+    </script>
+</body>
+</html>
