@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第3讲:Linux命令的艺术 - 海巴巴Linux培训班</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0f3460 0%, #533483 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        header::before {
+            content: '>';
+            position: absolute;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 4em;
+            opacity: 0.2;
+            font-family: 'Courier New', monospace;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 0.2; }
+            51%, 100% { opacity: 0.4; }
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .class-info {
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        nav {
+            background: #f8f9fa;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #0f3460;
+            padding: 10px 20px;
+            border-radius: 25px;
+            background: white;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        nav a:hover {
+            background: #0f3460;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .time-tag {
+            background: #e94560;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        section {
+            margin-bottom: 60px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #0f3460;
+        }
+
+        h2 {
+            color: #0f3460;
+            font-size: 2em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        h3 {
+            color: #533483;
+            font-size: 1.5em;
+            margin: 25px 0 15px 0;
+        }
+
+        .philosophy-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 25px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .philosophy-box::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-size: 8em;
+            opacity: 0.1;
+            font-family: Georgia, serif;
+        }
+
+        .philosophy-box blockquote {
+            font-size: 1.3em;
+            font-style: italic;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .philosophy-box .author {
+            text-align: right;
+            opacity: 0.9;
+        }
+
+        .command-box {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .command-box .prompt {
+            color: #569cd6;
+        }
+
+        .command-box .command {
+            color: #dcdcaa;
+        }
+
+        .command-box .option {
+            color: #ce9178;
+        }
+
+        .command-box .argument {
+            color: #9cdcfe;
+        }
+
+        .command-box .output {
+            color: #d4d4d4;
+        }
+
+        .command-box .comment {
+            color: #6a9955;
+        }
+
+        .anatomy-diagram {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .anatomy-parts {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .anatomy-part {
+            text-align: center;
+        }
+
+        .anatomy-code {
+            font-family: 'Courier New', monospace;
+            font-size: 2em;
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .anatomy-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .part-command { background: #e3f2fd; color: #1565c0; }
+        .part-option { background: #fff3e0; color: #e65100; }
+        .part-argument { background: #e8f5e9; color: #2e7d32; }
+
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #e94560;
+        }
+
+        .command-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .command-table th {
+            background: #0f3460;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .command-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .command-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .command-table code {
+            background: #f0f0f0;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #0f3460;
+        }
+
+        .interactive-demo {
+            background: #1e1e1e;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .demo-header {
+            background: #333;
+            padding: 10px 20px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .demo-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .demo-btn.red { background: #ff5f56; }
+        .demo-btn.yellow { background: #ffbd2e; }
+        .demo-btn.green { background: #27ca3f; }
+
+        .demo-body {
+            padding: 20px;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            min-height: 200px;
+        }
+
+        .try-it-box {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+        }
+
+        .try-it-box h4 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+
+        .quiz-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+        }
+
+        .quiz-question {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quiz-option {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateX(10px);
+        }
+
+        .quiz-option.correct {
+            background: #2ecc71;
+        }
+
+        .quiz-option.wrong {
+            background: #e74c3c;
+        }
+
+        .pipe-demo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .pipe-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            min-width: 150px;
+        }
+
+        .pipe-arrow {
+            font-size: 2em;
+            color: #e94560;
+        }
+
+        .highlight-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .student-names {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .student-tag {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 15px;
+        }
+
+        button {
+            background: #0f3460;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #533483;
+            transform: translateY(-2px);
+        }
+
+        .practice-task {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        footer {
+            background: #0f3460;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .typing-effect {
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 2s steps(40);
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        .command-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+            border-top: 4px solid #533483;
+        }
+
+        .command-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .command-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .zen-moment {
+            background: linear-gradient(135deg, #2d3436 0%, #000000 100%);
+            color: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .zen-moment .zen-symbol {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .zen-moment p {
+            font-size: 1.2em;
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            background: #eee;
+            height: 8px;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #11998e, #38ef7d);
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Linux命令的艺术</h1>
+            <p>第3讲 - 从敲键盘到与机器对话</p>
+            <div class="class-info">
+                海巴巴Linux培训班 | 王子臻 · 钱辰宇 · 钱姿妤
+            </div>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="#zen">命令行禅意 <span class="time-tag">5min</span></a></li>
+                <li><a href="#anatomy">命令解剖学 <span class="time-tag">5min</span></a></li>
+                <li><a href="#ls">ls深入 <span class="time-tag">8min</span></a></li>
+                <li><a href="#view">文件窥探术 <span class="time-tag">8min</span></a></li>
+                <li><a href="#grep">grep搜索 <span class="time-tag">6min</span></a></li>
+                <li><a href="#pipe">管道哲学 <span class="time-tag">5min</span></a></li>
+                <li><a href="#practice">实战 <span class="time-tag">3min</span></a></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <!-- 第一部分：命令行的禅意 -->
+            <section id="zen">
+                <h2>一、命令行的禅意</h2>
+
+                <div class="zen-moment">
+                    <div class="zen-symbol">道</div>
+                    <p>"大道至简，以简驭繁"</p>
+                </div>
+
+                <div class="philosophy-box">
+                    <blockquote>
+                        "Write programs that do one thing and do it well."<br/>
+                        写程序只做一件事，并把它做好。
+                    </blockquote>
+                    <div class="author">— Unix哲学，Doug McIlroy</div>
+                </div>
+
+                <h3>为什么要学命令行？</h3>
+
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div style="font-size: 2.5em; text-align: center; margin-bottom: 15px;">🎯</div>
+                        <h4 style="color: #0f3460; margin-bottom: 10px;">精准</h4>
+                        <p>图形界面是"指指点点"<br/>命令行是"直接表达意图"</p>
+                        <div class="command-box" style="font-size: 0.85em; margin-top: 10px;">
+                            <span class="comment"># 删除所有.tmp文件</span><br/>
+                            rm *.tmp
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <div style="font-size: 2.5em; text-align: center; margin-bottom: 15px;">⚡</div>
+                        <h4 style="color: #0f3460; margin-bottom: 10px;">高效</h4>
+                        <p>点击10次鼠标的事<br/>一行命令搞定</p>
+                        <div class="command-box" style="font-size: 0.85em; margin-top: 10px;">
+                            <span class="comment"># 批量重命名</span><br/>
+                            rename 's/old/new/' *
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <div style="font-size: 2.5em; text-align: center; margin-bottom: 15px;">🔗</div>
+                        <h4 style="color: #0f3460; margin-bottom: 10px;">可组合</h4>
+                        <p>小命令像乐高积木<br/>组合产生无限可能</p>
+                        <div class="command-box" style="font-size: 0.85em; margin-top: 10px;">
+                            <span class="comment"># 查找并统计</span><br/>
+                            ls | grep ".c" | wc -l
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <p><strong>💭 哲学思考：</strong>图形界面像是"餐厅点菜"——菜单上有什么你才能点什么；命令行像是"自己下厨"——只要食材在，想做什么菜都行。</p>
+                </div>
+
+                <div class="quiz-box">
+                    <div class="quiz-question">🤔 思考：为什么嵌入式设备大多只有命令行界面？</div>
+                    <button onclick="toggleAnswer('embed-answer')">讨论一下</button>
+                    <div id="embed-answer" class="hidden" style="margin-top: 15px; background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                        <p><strong>答案要点：</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li>资源有限：图形界面需要大量内存和CPU</li>
+                            <li>远程管理：通过SSH命令行远程控制更可靠</li>
+                            <li>自动化：脚本比人工点击更稳定</li>
+                            <li>专注本职：嵌入式设备的任务是工作，不是展示漂亮界面</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第二部分：命令解剖学 -->
+            <section id="anatomy">
+                <h2>二、命令解剖学</h2>
+
+                <p style="font-size: 1.1em; margin-bottom: 20px;">每个Linux命令都有固定的"骨架结构"，理解它就能读懂任何命令：</p>
+
+                <div class="anatomy-diagram">
+                    <h3 style="margin-top: 0;">命令的三要素</h3>
+                    <div class="anatomy-parts">
+                        <div class="anatomy-part">
+                            <div class="anatomy-code part-command">ls</div>
+                            <div class="anatomy-label">命令<br/>(做什么)</div>
+                        </div>
+                        <div class="anatomy-part">
+                            <div class="anatomy-code part-option">-l -a</div>
+                            <div class="anatomy-label">选项<br/>(怎么做)</div>
+                        </div>
+                        <div class="anatomy-part">
+                            <div class="anatomy-code part-argument">/home</div>
+                            <div class="anatomy-label">参数<br/>(对谁做)</div>
+                        </div>
+                    </div>
+
+                    <div class="command-box" style="text-align: left;">
+                        <span class="prompt">$</span> <span class="command">ls</span> <span class="option">-la</span> <span class="argument">/home</span>
+                    </div>
+                </div>
+
+                <h3>选项的两种写法</h3>
+
+                <table class="command-table">
+                    <tr>
+                        <th>类型</th>
+                        <th>格式</th>
+                        <th>示例</th>
+                        <th>特点</th>
+                    </tr>
+                    <tr>
+                        <td><strong>短选项</strong></td>
+                        <td>单横杠 + 单字母</td>
+                        <td><code>-l</code> <code>-a</code> <code>-h</code></td>
+                        <td>可合并: <code>-la</code> = <code>-l -a</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>长选项</strong></td>
+                        <td>双横杠 + 单词</td>
+                        <td><code>--all</code> <code>--help</code></td>
+                        <td>更易读，不能合并</td>
+                    </tr>
+                </table>
+
+                <div class="highlight-box">
+                    <p><strong>🎓 记忆口诀：</strong></p>
+                    <p style="font-size: 1.2em; text-align: center; margin: 15px 0; color: #0f3460;">
+                        "命令说做啥，选项说咋做，参数说对谁"
+                    </p>
+                </div>
+
+                <div class="try-it-box">
+                    <h4>🔬 解剖练习</h4>
+                    <p>分析这条命令的三要素：</p>
+                    <div class="command-box">cp -r /home/user/docs /backup/</div>
+                    <button onclick="toggleAnswer('anatomy-answer')">查看答案</button>
+                    <div id="anatomy-answer" class="hidden" style="margin-top: 15px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;">
+                        <p><strong>命令：</strong>cp（复制）</p>
+                        <p><strong>选项：</strong>-r（递归，复制整个目录）</p>
+                        <p><strong>参数：</strong>源路径 + 目标路径</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第三部分：ls命令深入 -->
+            <section id="ls">
+                <h2>三、ls 的七十二变</h2>
+
+                <div class="info-card">
+                    <p><strong>ls</strong> = <strong>l</strong>i<strong>s</strong>t，最常用的命令，没有之一。但它的参数组合可以展现出丰富的信息。</p>
+                </div>
+
+                <h3>ls 常用参数速查</h3>
+
+                <table class="command-table">
+                    <tr>
+                        <th>参数</th>
+                        <th>全称</th>
+                        <th>作用</th>
+                        <th>助记</th>
+                    </tr>
+                    <tr>
+                        <td><code>-l</code></td>
+                        <td>--long</td>
+                        <td>详细信息（权限、大小、时间）</td>
+                        <td>Long = 长格式</td>
+                    </tr>
+                    <tr>
+                        <td><code>-a</code></td>
+                        <td>--all</td>
+                        <td>显示隐藏文件（以.开头）</td>
+                        <td>All = 全部</td>
+                    </tr>
+                    <tr>
+                        <td><code>-h</code></td>
+                        <td>--human-readable</td>
+                        <td>人类可读的大小（KB/MB/GB）</td>
+                        <td>Human = 人类友好</td>
+                    </tr>
+                    <tr>
+                        <td><code>-t</code></td>
+                        <td>--sort=time</td>
+                        <td>按修改时间排序</td>
+                        <td>Time = 时间</td>
+                    </tr>
+                    <tr>
+                        <td><code>-r</code></td>
+                        <td>--reverse</td>
+                        <td>逆序排列</td>
+                        <td>Reverse = 反转</td>
+                    </tr>
+                    <tr>
+                        <td><code>-S</code></td>
+                        <td>--sort=size</td>
+                        <td>按文件大小排序</td>
+                        <td>Size = 大小</td>
+                    </tr>
+                    <tr>
+                        <td><code>-R</code></td>
+                        <td>--recursive</td>
+                        <td>递归显示子目录</td>
+                        <td>Recursive = 递归</td>
+                    </tr>
+                </table>
+
+                <h3>实战演示</h3>
+
+                <div class="interactive-demo">
+                    <div class="demo-header">
+                        <div class="demo-btn red"></div>
+                        <div class="demo-btn yellow"></div>
+                        <div class="demo-btn green"></div>
+                        <span style="color: #888; margin-left: 10px;">Terminal</span>
+                    </div>
+                    <div class="demo-body">
+                        <span style="color: #569cd6;">user@linux</span>:<span style="color: #ce9178;">~</span>$ ls<br/>
+                        Documents  Downloads  Pictures  Videos<br/><br/>
+
+                        <span style="color: #569cd6;">user@linux</span>:<span style="color: #ce9178;">~</span>$ ls -a<br/>
+                        <span style="color: #888;">.  ..  .bashrc  .profile</span>  Documents  Downloads  Pictures<br/><br/>
+
+                        <span style="color: #569cd6;">user@linux</span>:<span style="color: #ce9178;">~</span>$ ls -lh<br/>
+                        total 16K<br/>
+                        drwxr-xr-x 2 user user <span style="color: #dcdcaa;">4.0K</span> Jan 10 10:00 Documents<br/>
+                        drwxr-xr-x 2 user user <span style="color: #dcdcaa;">4.0K</span> Jan 10 09:30 Downloads<br/>
+                        -rw-r--r-- 1 user user <span style="color: #dcdcaa;">2.5M</span> Jan  9 15:20 report.pdf<br/><br/>
+
+                        <span style="color: #569cd6;">user@linux</span>:<span style="color: #ce9178;">~</span>$ ls -lt <span style="color: #6a9955;"># 按时间排序，最新的在前</span><br/>
+                        <span style="color: #569cd6;">user@linux</span>:<span style="color: #ce9178;">~</span>$ ls -lS <span style="color: #6a9955;"># 按大小排序，最大的在前</span>
+                    </div>
+                </div>
+
+                <div class="quiz-box">
+                    <div class="quiz-question">🎯 小测验：如何显示所有文件（包括隐藏）的详细信息，且大小用人类友好格式？</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">A. ls -l -a</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">B. ls -lah</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">C. ls --all --long</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">D. ls -la --size</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第四部分：文件查看命令 -->
+            <section id="view">
+                <h2>四、文件窥探术</h2>
+
+                <div class="philosophy-box">
+                    <blockquote>
+                        "不谋全局者，不足谋一域；不谋万世者，不足谋一时。"
+                    </blockquote>
+                    <div class="author">— 有时看全貌，有时看局部</div>
+                </div>
+
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div style="font-size: 2.5em; text-align: center; margin-bottom: 10px;">📜</div>
+                        <h4 style="color: #0f3460;">cat - 全文阅读</h4>
+                        <p>concatenate（连接），显示文件全部内容</p>
+                        <div class="command-box" style="font-size: 0.85em;">
+                            cat file.txt<br/>
+                            cat -n file.txt <span class="comment"># 显示行号</span>
+                        </div>
+                        <p style="color: #e94560; margin-top: 10px; font-size: 0.9em;">⚠️ 大文件慎用！</p>
+                    </div>
+
+                    <div class="command-card">
+                        <div style="font-size: 2.5em; text-align: center; margin-bottom: 10px;">🔝</div>
+                        <h4 style="color: #0f3460;">head - 看开头</h4>
+                        <p>显示文件前几行（默认10行）</p>
+                        <div class="command-box" style="font-size: 0.85em;">
+                            head file.txt<br/>
+                            head -n 5 file.txt <span class="comment"># 前5行</span><br/>
+                            head -20 file.txt <span class="comment"># 前20行</span>
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <div style="font-size: 2.5em; text-align: center; margin-bottom: 10px;">🔚</div>
+                        <h4 style="color: #0f3460;">tail - 看结尾</h4>
+                        <p>显示文件末尾几行（默认10行）</p>
+                        <div class="command-box" style="font-size: 0.85em;">
+                            tail file.txt<br/>
+                            tail -n 5 file.txt <span class="comment"># 后5行</span><br/>
+                            tail -f log.txt <span class="comment"># 实时追踪！</span>
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <div style="font-size: 2.5em; text-align: center; margin-bottom: 10px;">📖</div>
+                        <h4 style="color: #0f3460;">less - 分页浏览</h4>
+                        <p>交互式查看，可翻页搜索</p>
+                        <div class="command-box" style="font-size: 0.85em;">
+                            less file.txt<br/>
+                            <span class="comment"># 空格=下一页 b=上一页</span><br/>
+                            <span class="comment"># /keyword 搜索 q 退出</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <p><strong>🌟 黄金组合：tail -f</strong></p>
+                    <p style="margin-top: 10px;"><code>tail -f</code> 是运维神器！实时监控日志文件，新内容自动显示。</p>
+                    <div class="command-box">
+                        tail -f /var/log/syslog <span class="comment"># 实时查看系统日志</span>
+                    </div>
+                    <p style="margin-top: 10px; color: #666;">想象你在看一本正在被书写的书，每写一行你就能立刻看到。</p>
+                </div>
+
+                <div class="try-it-box">
+                    <h4>💡 场景思考</h4>
+                    <p>你有一个100万行的日志文件 app.log，如何高效查看？</p>
+                    <ul style="margin: 15px 0 15px 20px;">
+                        <li>只想看最近的错误 → <code>tail -100 app.log</code></li>
+                        <li>想搜索特定内容 → <code>less app.log</code> 然后 /error</li>
+                        <li>实时监控新日志 → <code>tail -f app.log</code></li>
+                        <li>看文件开头 → <code>head app.log</code></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 第五部分：grep搜索 -->
+            <section id="grep">
+                <h2>五、grep - 文本搜索的瑞士军刀</h2>
+
+                <div class="info-card">
+                    <p><strong>grep</strong> = <strong>G</strong>lobal <strong>R</strong>egular <strong>E</strong>xpression <strong>P</strong>rint</p>
+                    <p>全局正则表达式打印 —— 在文件中搜索匹配的行</p>
+                </div>
+
+                <h3>基本用法</h3>
+
+                <div class="command-box">
+                    grep "搜索内容" 文件名<br/><br/>
+                    <span class="comment"># 示例</span><br/>
+                    grep "error" app.log <span class="comment"># 在app.log中找包含error的行</span><br/>
+                    grep "TODO" *.c <span class="comment"># 在所有.c文件中找TODO</span>
+                </div>
+
+                <h3>常用参数</h3>
+
+                <table class="command-table">
+                    <tr>
+                        <th>参数</th>
+                        <th>作用</th>
+                        <th>示例</th>
+                    </tr>
+                    <tr>
+                        <td><code>-i</code></td>
+                        <td>忽略大小写 (ignore case)</td>
+                        <td><code>grep -i "error" log</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>-n</code></td>
+                        <td>显示行号 (number)</td>
+                        <td><code>grep -n "main" *.c</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>-r</code></td>
+                        <td>递归搜索目录 (recursive)</td>
+                        <td><code>grep -r "config" /etc/</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>-v</code></td>
+                        <td>反向匹配（不包含）(invert)</td>
+                        <td><code>grep -v "debug" log</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>-c</code></td>
+                        <td>只统计匹配行数 (count)</td>
+                        <td><code>grep -c "error" log</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>-l</code></td>
+                        <td>只显示文件名 (files with matches)</td>
+                        <td><code>grep -l "main" *.c</code></td>
+                    </tr>
+                </table>
+
+                <div class="interactive-demo">
+                    <div class="demo-header">
+                        <div class="demo-btn red"></div>
+                        <div class="demo-btn yellow"></div>
+                        <div class="demo-btn green"></div>
+                        <span style="color: #888; margin-left: 10px;">grep 实战</span>
+                    </div>
+                    <div class="demo-body">
+                        <span class="comment"># 在当前目录所有.c文件中搜索"printf"，显示行号</span><br/>
+                        $ grep -n "printf" *.c<br/>
+                        main.c:15:    printf("Hello World\n");<br/>
+                        utils.c:42:    printf("Error: %s\n", msg);<br/><br/>
+
+                        <span class="comment"># 统计日志中error出现的次数</span><br/>
+                        $ grep -c "error" app.log<br/>
+                        23<br/><br/>
+
+                        <span class="comment"># 找出不包含"debug"的行</span><br/>
+                        $ grep -v "debug" app.log | head -5
+                    </div>
+                </div>
+
+                <div class="quiz-box">
+                    <div class="quiz-question">🎯 如何在 /etc 目录下递归搜索包含 "network" 的文件，且忽略大小写？</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">A. grep "network" /etc</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">B. grep -r "network" /etc</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">C. grep -ri "network" /etc</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">D. grep -i "network" /etc/*</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第六部分：管道哲学 -->
+            <section id="pipe">
+                <h2>六、管道 | —— 命令组合的艺术</h2>
+
+                <div class="zen-moment">
+                    <div class="zen-symbol">|</div>
+                    <p>"管道是Unix哲学的精髓：让简单的工具组合成强大的系统"</p>
+                </div>
+
+                <div class="info-card">
+                    <p><strong>管道 <code>|</code></strong> 把前一个命令的输出，作为后一个命令的输入。</p>
+                    <p style="margin-top: 10px;">就像工厂流水线：产品从一个工位传到下一个工位加工。</p>
+                </div>
+
+                <h3>管道的工作原理</h3>
+
+                <div class="pipe-demo">
+                    <div class="pipe-box">
+                        <div style="font-size: 2em;">📄</div>
+                        <div><code>cat file</code></div>
+                        <div style="font-size: 0.8em; color: #666;">读取文件</div>
+                    </div>
+                    <div class="pipe-arrow">→</div>
+                    <div class="pipe-box">
+                        <div style="font-size: 2em;">🔍</div>
+                        <div><code>grep "err"</code></div>
+                        <div style="font-size: 0.8em; color: #666;">过滤内容</div>
+                    </div>
+                    <div class="pipe-arrow">→</div>
+                    <div class="pipe-box">
+                        <div style="font-size: 2em;">📊</div>
+                        <div><code>wc -l</code></div>
+                        <div style="font-size: 0.8em; color: #666;">统计行数</div>
+                    </div>
+                </div>
+
+                <div class="command-box">
+                    cat app.log | grep "error" | wc -l<br/>
+                    <span class="comment"># 结果：统计日志中error出现的行数</span>
+                </div>
+
+                <h3>常见管道组合</h3>
+
+                <table class="command-table">
+                    <tr>
+                        <th>命令组合</th>
+                        <th>作用</th>
+                    </tr>
+                    <tr>
+                        <td><code>ls -l | head -10</code></td>
+                        <td>只看前10个文件</td>
+                    </tr>
+                    <tr>
+                        <td><code>cat file | grep "key" | wc -l</code></td>
+                        <td>统计关键词出现次数</td>
+                    </tr>
+                    <tr>
+                        <td><code>ps aux | grep "nginx"</code></td>
+                        <td>查找nginx进程</td>
+                    </tr>
+                    <tr>
+                        <td><code>history | grep "git"</code></td>
+                        <td>查找历史git命令</td>
+                    </tr>
+                    <tr>
+                        <td><code>ls -l | sort -k5 -n</code></td>
+                        <td>按文件大小排序</td>
+                    </tr>
+                    <tr>
+                        <td><code>cat file | sort | uniq</code></td>
+                        <td>排序并去重</td>
+                    </tr>
+                </table>
+
+                <div class="philosophy-box">
+                    <blockquote>
+                        "众多简单工具，通过管道组合，能解决复杂问题。"
+                    </blockquote>
+                    <div class="author">— 这就是Unix之道</div>
+                </div>
+
+                <div class="try-it-box">
+                    <h4>🧩 组合挑战</h4>
+                    <p>用管道组合完成：显示当前目录下最大的5个文件</p>
+                    <button onclick="toggleAnswer('pipe-answer')">查看答案</button>
+                    <div id="pipe-answer" class="hidden" style="margin-top: 15px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;">
+                        <div class="command-box">
+                            ls -lS | head -6<br/>
+                            <span class="comment"># -S 按大小排序，head -6 因为第一行是total</span>
+                        </div>
+                        <p>或者更精确：</p>
+                        <div class="command-box">
+                            ls -lS | tail -n +2 | head -5
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第七部分：实战练习 -->
+            <section id="practice">
+                <h2>七、实战演练</h2>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 85%;"></div>
+                </div>
+                <p style="text-align: center; color: #666; margin-bottom: 20px;">课程进度 85%</p>
+
+                <div class="try-it-box">
+                    <h4>🎮 练习任务</h4>
+
+                    <div class="practice-task">
+                        <p><strong>任务1：</strong>查看 /etc 目录下所有以 .conf 结尾的文件，按修改时间排序</p>
+                        <button onclick="toggleAnswer('task1')">提示</button>
+                        <div id="task1" class="hidden" style="margin-top: 10px;">
+                            <code>ls -lt /etc/*.conf</code>
+                        </div>
+                    </div>
+
+                    <div class="practice-task">
+                        <p><strong>任务2：</strong>在 /var/log 目录下搜索包含 "error" 的文件（忽略大小写）</p>
+                        <button onclick="toggleAnswer('task2')">提示</button>
+                        <div id="task2" class="hidden" style="margin-top: 10px;">
+                            <code>grep -ri "error" /var/log/</code> 或 <code>grep -ril "error" /var/log/</code>
+                        </div>
+                    </div>
+
+                    <div class="practice-task">
+                        <p><strong>任务3：</strong>统计当前目录下有多少个 .c 文件</p>
+                        <button onclick="toggleAnswer('task3')">提示</button>
+                        <div id="task3" class="hidden" style="margin-top: 10px;">
+                            <code>ls *.c | wc -l</code> 或 <code>ls -l *.c | wc -l</code>
+                        </div>
+                    </div>
+
+                    <div class="practice-task">
+                        <p><strong>任务4：</strong>实时监控 /var/log/syslog 的最新内容</p>
+                        <button onclick="toggleAnswer('task4')">提示</button>
+                        <div id="task4" class="hidden" style="margin-top: 10px;">
+                            <code>tail -f /var/log/syslog</code>（按 Ctrl+C 退出）
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quiz-box">
+                    <div class="quiz-question">🏆 综合挑战：查看系统中所有用户名（/etc/passwd的第一列，用:分隔）</div>
+                    <button onclick="toggleAnswer('final-challenge')">查看答案</button>
+                    <div id="final-challenge" class="hidden" style="margin-top: 15px; background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                        <p><strong>方法：</strong></p>
+                        <div class="command-box">
+                            cat /etc/passwd | cut -d: -f1<br/>
+                            <span class="comment"># cut 命令：-d 指定分隔符，-f1 取第一列</span>
+                        </div>
+                        <p style="margin-top: 10px;">这就是管道的威力！简单命令组合解决复杂需求。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 课后总结 -->
+            <section>
+                <h2>📝 今日总结</h2>
+
+                <div class="command-grid">
+                    <div class="info-card" style="border-color: #0f3460;">
+                        <h4 style="color: #0f3460; margin-bottom: 10px;">命令结构</h4>
+                        <p>命令 + 选项 + 参数<br/>短选项可合并：-la = -l -a</p>
+                    </div>
+
+                    <div class="info-card" style="border-color: #533483;">
+                        <h4 style="color: #533483; margin-bottom: 10px;">ls 参数</h4>
+                        <p>-l 详细 | -a 全部 | -h 人类友好<br/>-t 按时间 | -S 按大小 | -r 逆序</p>
+                    </div>
+
+                    <div class="info-card" style="border-color: #e94560;">
+                        <h4 style="color: #e94560; margin-bottom: 10px;">文件查看</h4>
+                        <p>cat 全部 | head 开头 | tail 结尾<br/>less 分页 | tail -f 实时追踪</p>
+                    </div>
+
+                    <div class="info-card" style="border-color: #11998e;">
+                        <h4 style="color: #11998e; margin-bottom: 10px;">grep 搜索</h4>
+                        <p>-i 忽略大小写 | -n 行号 | -r 递归<br/>-v 反向 | -c 统计 | -l 文件名</p>
+                    </div>
+                </div>
+
+                <div class="zen-moment" style="margin-top: 30px;">
+                    <div class="zen-symbol">道</div>
+                    <p>"简单的命令，通过管道组合，产生无限可能。<br/>这就是Linux之美。"</p>
+                </div>
+            </section>
+
+            <!-- 课后作业 -->
+            <section>
+                <h2>📚 课后作业</h2>
+
+                <div class="info-card">
+                    <h4 style="margin-top: 0;">必做：</h4>
+                    <ol style="margin-left: 20px; margin-top: 10px;">
+                        <li>练习 ls 的各种参数组合，记住至少5个常用选项</li>
+                        <li>用 grep 在 /etc 目录下搜索包含你用户名的文件</li>
+                        <li>用管道组合统计 /usr/bin 目录下有多少个可执行文件</li>
+                        <li>用 tail -f 监控一个日志文件5分钟，观察输出</li>
+                    </ol>
+                </div>
+
+                <div class="info-card" style="border-color: #533483;">
+                    <h4 style="margin-top: 0; color: #533483;">思考题：</h4>
+                    <ol style="margin-left: 20px; margin-top: 10px;">
+                        <li>为什么说"一切皆文件"和"管道"是Unix两大核心哲学？</li>
+                        <li><code>cat file | grep "x"</code> 和 <code>grep "x" file</code> 有什么区别？哪个更好？</li>
+                        <li>如果要你设计一个命令来统计代码行数，你会怎么组合现有命令？</li>
+                    </ol>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <h3 style="margin-bottom: 15px;">下节课预告</h3>
+            <p style="font-size: 1.1em;">权限管理 & 用户系统 —— Linux的安全基石</p>
+            <p style="margin-top: 20px; opacity: 0.8;">海巴巴Linux培训班 | 实践出真知</p>
+            <div class="student-names" style="margin-top: 15px;">
+                <span class="student-tag">王子臻</span>
+                <span class="student-tag">钱辰宇</span>
+                <span class="student-tag">钱姿妤</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        function toggleAnswer(id) {
+            const element = document.getElementById(id);
+            element.classList.toggle('hidden');
+        }
+
+        function checkQuiz(element, isCorrect) {
+            const options = element.parentElement.children;
+            for (let option of options) {
+                option.classList.remove('correct', 'wrong');
+                option.style.pointerEvents = 'none';
+            }
+
+            if (isCorrect) {
+                element.classList.add('correct');
+                setTimeout(() => {
+                    alert('✅ 正确！');
+                }, 200);
+            } else {
+                element.classList.add('wrong');
+                // 显示正确答案
+                for (let option of options) {
+                    if (option.onclick && option.onclick.toString().includes('true')) {
+                        option.classList.add('correct');
+                    }
+                }
+                setTimeout(() => {
+                    alert('❌ 再想想！正确答案已标出。');
+                }, 200);
+            }
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href').split(' ')[0]);
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // 页面加载动画
+        window.addEventListener('load', () => {
+            const sections = document.querySelectorAll('section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            sections.forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = 'all 0.5s ease-out';
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>

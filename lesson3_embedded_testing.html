@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第3讲(下):嵌入式产品开发与测试 - 海巴巴Linux培训班</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #d63031 0%, #e17055 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        header::before {
+            content: '🔬';
+            position: absolute;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 3em;
+            opacity: 0.3;
+        }
+
+        header h1 {
+            font-size: 2.3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .class-info {
+            background: rgba(255,255,255,0.15);
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        nav {
+            background: #f8f9fa;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #d63031;
+            padding: 10px 20px;
+            border-radius: 25px;
+            background: white;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        nav a:hover {
+            background: #d63031;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .time-tag {
+            background: #0984e3;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        section {
+            margin-bottom: 60px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #d63031;
+        }
+
+        h2 {
+            color: #d63031;
+            font-size: 1.9em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        h3 {
+            color: #e17055;
+            font-size: 1.4em;
+            margin: 25px 0 15px 0;
+        }
+
+        .philosophy-box {
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 25px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .philosophy-box::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-size: 8em;
+            opacity: 0.1;
+            font-family: Georgia, serif;
+        }
+
+        .philosophy-box blockquote {
+            font-size: 1.3em;
+            font-style: italic;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .philosophy-box .author {
+            text-align: right;
+            opacity: 0.9;
+        }
+
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #0984e3;
+        }
+
+        .warning-card {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .danger-card {
+            background: #ffe6e6;
+            border: 2px solid #d63031;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .success-card {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        /* 流程图样式 */
+        .process-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+        }
+
+        .process-step {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 100px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+
+        .process-step:hover {
+            transform: scale(1.05);
+        }
+
+        .process-step .step-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .process-arrow {
+            font-size: 2em;
+            color: #d63031;
+        }
+
+        /* V模型样式 */
+        .v-model {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .v-model-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .v-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .v-box {
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 140px;
+            font-weight: 600;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .v-left { background: #74b9ff; color: #0984e3; }
+        .v-right { background: #55efc4; color: #00b894; }
+        .v-bottom { background: #fd79a8; color: #e84393; }
+
+        .v-connector {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        /* 饼图样式 */
+        .pie-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .pie-chart {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #d63031 0deg 126deg,
+                #0984e3 126deg 234deg,
+                #00b894 234deg 306deg,
+                #fdcb6e 306deg 360deg
+            );
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .pie-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .pie-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        /* 统计数字 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #d63031, #e17055);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 10px;
+        }
+
+        /* 测试金字塔 */
+        .pyramid-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+        }
+
+        .pyramid-level {
+            padding: 15px;
+            text-align: center;
+            color: white;
+            font-weight: 600;
+            margin: 2px 0;
+            border-radius: 5px;
+            transition: transform 0.3s;
+        }
+
+        .pyramid-level:hover {
+            transform: scale(1.02);
+        }
+
+        .pyramid-1 { width: 30%; background: #e17055; }
+        .pyramid-2 { width: 50%; background: #fdcb6e; color: #333; }
+        .pyramid-3 { width: 70%; background: #00b894; }
+        .pyramid-4 { width: 90%; background: #0984e3; }
+
+        /* 命令网格 */
+        .command-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .command-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            border-top: 4px solid #d63031;
+        }
+
+        .command-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        /* 测验 */
+        .quiz-box {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+        }
+
+        .quiz-question {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quiz-option {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateX(10px);
+        }
+
+        .quiz-option.correct { background: #00b894; }
+        .quiz-option.wrong { background: #d63031; }
+
+        /* 时间线 */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+            margin: 20px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #d63031;
+        }
+
+        .timeline-item {
+            padding-left: 50px;
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            background: #d63031;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .timeline-content {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .timeline-title {
+            color: #d63031;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* 案例框 */
+        .case-study {
+            background: linear-gradient(135deg, #2d3436 0%, #000000 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 25px 0;
+        }
+
+        .case-study h4 {
+            color: #fdcb6e;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .case-study .highlight {
+            color: #ff7675;
+            font-weight: bold;
+        }
+
+        /* 表格 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .data-table th {
+            background: #d63031;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        /* 按钮 */
+        button {
+            background: #d63031;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #e17055;
+            transform: translateY(-2px);
+        }
+
+        .student-names {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .student-tag {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 15px;
+        }
+
+        footer {
+            background: #d63031;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .progress-bar {
+            background: #eee;
+            height: 8px;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #d63031, #e17055);
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        /* 动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>嵌入式产品开发与测试</h1>
+            <p>第3讲(下) - 质量是设计出来的，更是测试出来的</p>
+            <div class="class-info">
+                海巴巴Linux培训班 | 王子臻 · 钱辰宇 · 钱姿妤
+            </div>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="#dev-process">开发流程 <span class="time-tag">6min</span></a></li>
+                <li><a href="#importance">测试重要性 <span class="time-tag">8min</span></a></li>
+                <li><a href="#investment">测试投入 <span class="time-tag">5min</span></a></li>
+                <li><a href="#methods">测试手段 <span class="time-tag">10min</span></a></li>
+                <li><a href="#planning">测试规划 <span class="time-tag">6min</span></a></li>
+                <li><a href="#professionalism">测试专业性 <span class="time-tag">5min</span></a></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <!-- 第一部分：开发流程 -->
+            <section id="dev-process">
+                <h2>一、嵌入式产品开发流程</h2>
+
+                <div class="philosophy-box">
+                    <blockquote>
+                        "凡事预则立，不预则废。"
+                    </blockquote>
+                    <div class="author">— 《礼记·中庸》</div>
+                </div>
+
+                <h3>产品开发生命周期</h3>
+
+                <div class="process-flow">
+                    <div class="process-step">
+                        <div class="step-icon">💡</div>
+                        <div>需求分析</div>
+                    </div>
+                    <div class="process-arrow">→</div>
+                    <div class="process-step">
+                        <div class="step-icon">📐</div>
+                        <div>系统设计</div>
+                    </div>
+                    <div class="process-arrow">→</div>
+                    <div class="process-step">
+                        <div class="step-icon">⚙️</div>
+                        <div>硬件开发</div>
+                    </div>
+                    <div class="process-arrow">→</div>
+                    <div class="process-step">
+                        <div class="step-icon">💻</div>
+                        <div>软件开发</div>
+                    </div>
+                    <div class="process-arrow">→</div>
+                    <div class="process-step">
+                        <div class="step-icon">🔬</div>
+                        <div>测试验证</div>
+                    </div>
+                    <div class="process-arrow">→</div>
+                    <div class="process-step">
+                        <div class="step-icon">🚀</div>
+                        <div>量产发布</div>
+                    </div>
+                </div>
+
+                <h3>嵌入式开发的特殊性</h3>
+
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div style="font-size: 2em; text-align: center; margin-bottom: 10px;">🔧</div>
+                        <h4 style="color: #d63031;">软硬件协同</h4>
+                        <p>软件必须适配特定硬件，一改动可能牵一发动全身</p>
+                    </div>
+                    <div class="command-card">
+                        <div style="font-size: 2em; text-align: center; margin-bottom: 10px;">📦</div>
+                        <h4 style="color: #d63031;">资源受限</h4>
+                        <p>内存、存储、算力有限，不能像PC那样"挥霍"</p>
+                    </div>
+                    <div class="command-card">
+                        <div style="font-size: 2em; text-align: center; margin-bottom: 10px;">🔒</div>
+                        <h4 style="color: #d63031;">难以更新</h4>
+                        <p>出厂后更新困难，一个Bug可能召回百万设备</p>
+                    </div>
+                    <div class="command-card">
+                        <div style="font-size: 2em; text-align: center; margin-bottom: 10px;">⏱️</div>
+                        <h4 style="color: #d63031;">实时性要求</h4>
+                        <p>很多场景要求毫秒级响应，延迟=故障</p>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <p><strong>💡 关键认知：</strong>嵌入式产品一旦出货，修复成本是开发阶段的<strong style="color: #d63031;">10-100倍</strong>。所以，<strong>测试不是可选项，是生命线</strong>。</p>
+                </div>
+            </section>
+
+            <!-- 第二部分：测试的重要性 -->
+            <section id="importance">
+                <h2>二、测试的重要性</h2>
+
+                <div class="philosophy-box">
+                    <blockquote>
+                        "千里之堤，溃于蚁穴。"
+                    </blockquote>
+                    <div class="author">— 一个小Bug可能毁掉整个产品</div>
+                </div>
+
+                <h3>真实案例：测试缺失的代价</h3>
+
+                <div class="case-study">
+                    <h4>🚗 案例1：丰田刹车门事件（2009-2011）</h4>
+                    <p>软件Bug导致车辆意外加速，<span class="highlight">89人死亡</span>，召回<span class="highlight">900万辆</span>汽车</p>
+                    <p style="margin-top: 10px;">代价：赔偿12亿美元 + 品牌声誉损失</p>
+                </div>
+
+                <div class="case-study">
+                    <h4>🚀 案例2：阿丽亚娜5号火箭爆炸（1996）</h4>
+                    <p>64位浮点数转16位整数溢出，火箭发射<span class="highlight">37秒后爆炸</span></p>
+                    <p style="margin-top: 10px;">代价：5亿美元化为灰烬</p>
+                </div>
+
+                <div class="case-study">
+                    <h4>💉 案例3：Therac-25放疗机事故（1985-1987）</h4>
+                    <p>软件竞态条件Bug导致辐射剂量超标100倍，<span class="highlight">6人死亡</span></p>
+                    <p style="margin-top: 10px;">这是软件工程史上最惨痛的教训之一</p>
+                </div>
+
+                <h3>Bug修复成本曲线</h3>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">1x</div>
+                        <div class="stat-label">需求阶段发现</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">5x</div>
+                        <div class="stat-label">设计阶段发现</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">10x</div>
+                        <div class="stat-label">编码阶段发现</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">20x</div>
+                        <div class="stat-label">测试阶段发现</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">150x</div>
+                        <div class="stat-label" style="color: #d63031; font-weight: bold;">发布后发现</div>
+                    </div>
+                </div>
+
+                <div class="warning-card">
+                    <p><strong>⚠️ 铁律：</strong>Bug发现越晚，修复成本越高。测试的本质是<strong>把问题消灭在摇篮里</strong>。</p>
+                </div>
+
+                <div class="quiz-box">
+                    <div class="quiz-question">🤔 思考：为什么嵌入式Bug的修复成本比互联网产品高得多？</div>
+                    <button onclick="toggleAnswer('bug-cost')">讨论一下</button>
+                    <div id="bug-cost" class="hidden" style="margin-top: 15px; background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                        <ul style="margin-left: 20px;">
+                            <li><strong>物理召回</strong>：可能需要回收设备</li>
+                            <li><strong>固件更新困难</strong>：很多设备没有OTA能力</li>
+                            <li><strong>现场服务</strong>：需要派工程师上门</li>
+                            <li><strong>安全责任</strong>：涉及人身安全时，法律责任巨大</li>
+                            <li><strong>品牌损失</strong>：一次事故可能毁掉多年积累的信任</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第三部分：测试投入 -->
+            <section id="investment">
+                <h2>三、公司测试投入占比</h2>
+
+                <div class="philosophy-box">
+                    <blockquote>
+                        "质量不是检验出来的，质量是设计和制造出来的。但没有检验，你永远不知道质量如何。"
+                    </blockquote>
+                    <div class="author">— 戴明（质量管理大师）</div>
+                </div>
+
+                <h3>行业测试投入数据</h3>
+
+                <div class="pie-container">
+                    <div class="pie-chart">
+                        <div class="pie-center">研发<br/>预算</div>
+                    </div>
+                    <div class="pie-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #d63031;"></div>
+                            <span><strong>测试：35%</strong>（业界平均）</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #0984e3;"></div>
+                            <span>开发：30%</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #00b894;"></div>
+                            <span>设计：20%</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #fdcb6e;"></div>
+                            <span>需求/管理：15%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>不同行业测试投入对比</h3>
+
+                <table class="data-table">
+                    <tr>
+                        <th>行业</th>
+                        <th>测试占比</th>
+                        <th>原因</th>
+                    </tr>
+                    <tr>
+                        <td>🚗 汽车电子</td>
+                        <td><strong style="color: #d63031;">40-50%</strong></td>
+                        <td>安全攸关，法规严格（ISO 26262）</td>
+                    </tr>
+                    <tr>
+                        <td>✈️ 航空航天</td>
+                        <td><strong style="color: #d63031;">50-60%</strong></td>
+                        <td>零容错，DO-178C认证</td>
+                    </tr>
+                    <tr>
+                        <td>🏥 医疗设备</td>
+                        <td><strong style="color: #d63031;">40-50%</strong></td>
+                        <td>FDA认证，人命关天</td>
+                    </tr>
+                    <tr>
+                        <td>📱 消费电子</td>
+                        <td>25-35%</td>
+                        <td>竞争激烈，快速迭代</td>
+                    </tr>
+                    <tr>
+                        <td>🏭 工业控制</td>
+                        <td>35-45%</td>
+                        <td>稳定性要求高，长期运行</td>
+                    </tr>
+                    <tr>
+                        <td>🌐 互联网软件</td>
+                        <td>20-30%</td>
+                        <td>可快速修复，热更新</td>
+                    </tr>
+                </table>
+
+                <div class="success-card">
+                    <p><strong>💡 启示：</strong>越是关乎安全、难以修复的领域，测试投入越高。<strong>投入测试不是成本，是保险</strong>——用30%的投入避免300%的损失。</p>
+                </div>
+
+                <div class="info-card">
+                    <p><strong>🏢 大厂数据参考：</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>微软：开发与测试人员比例约 1:1</li>
+                        <li>Google：强调自动化，工程师自己写测试</li>
+                        <li>华为：测试投入占研发30-40%</li>
+                        <li>特斯拉：OTA能力强，但车规测试仍占40%+</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 第四部分：测试手段 -->
+            <section id="methods">
+                <h2>四、测试的主要手段</h2>
+
+                <div class="philosophy-box">
+                    <blockquote>
+                        "工欲善其事，必先利其器。"
+                    </blockquote>
+                    <div class="author">— 《论语》</div>
+                </div>
+
+                <h3>测试金字塔</h3>
+
+                <div class="pyramid-container">
+                    <p style="margin-bottom: 20px; color: #666;">越往下，数量越多，速度越快，成本越低</p>
+                    <div class="pyramid-level pyramid-1">🔝 E2E测试（端到端）</div>
+                    <div class="pyramid-level pyramid-2">📊 系统测试 / 集成测试</div>
+                    <div class="pyramid-level pyramid-3">🔗 接口测试 / API测试</div>
+                    <div class="pyramid-level pyramid-4">🧱 单元测试（最多、最快、最便宜）</div>
+                </div>
+
+                <h3>嵌入式测试手段详解</h3>
+
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div style="font-size: 2em; text-align: center; margin-bottom: 10px;">🧱</div>
+                        <h4 style="color: #0984e3;">单元测试</h4>
+                        <p><strong>对象：</strong>单个函数/模块</p>
+                        <p><strong>工具：</strong>Unity, CUnit, Google Test</p>
+                        <p><strong>特点：</strong>快速、精准定位问题</p>
+                    </div>
+                    <div class="command-card">
+                        <div style="font-size: 2em; text-align: center; margin-bottom: 10px;">🔗</div>
+                        <h4 style="color: #00b894;">集成测试</h4>
+                        <p><strong>对象：</strong>模块间接口</p>
+                        <p><strong>方法：</strong>自顶向下/自底向上</p>
+                        <p><strong>特点：</strong>发现接口不匹配问题</p>
+                    </div>
+                    <div class="command-card">
+                        <div style="font-size: 2em; text-align: center; margin-bottom: 10px;">📊</div>
+                        <h4 style="color: #e17055;">系统测试</h4>
+                        <p><strong>对象：</strong>完整系统</p>
+                        <p><strong>内容：</strong>功能、性能、稳定性</p>
+                        <p><strong>特点：</strong>模拟真实使用场景</p>
+                    </div>
+                    <div class="command-card">
+                        <div style="font-size: 2em; text-align: center; margin-bottom: 10px;">🔥</div>
+                        <h4 style="color: #d63031;">压力测试</h4>
+                        <p><strong>目的：</strong>找到系统极限</p>
+                        <p><strong>方法：</strong>高负载、长时间运行</p>
+                        <p><strong>特点：</strong>暴露内存泄漏、死锁</p>
+                    </div>
+                </div>
+
+                <h3>嵌入式特有测试</h3>
+
+                <table class="data-table">
+                    <tr>
+                        <th>测试类型</th>
+                        <th>测试内容</th>
+                        <th>典型场景</th>
+                    </tr>
+                    <tr>
+                        <td><strong>HIL测试</strong><br/>(硬件在环)</td>
+                        <td>真实硬件 + 模拟环境</td>
+                        <td>汽车ECU测试，模拟各种路况</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SIL测试</strong><br/>(软件在环)</td>
+                        <td>软件 + 模拟硬件</td>
+                        <td>早期验证，无需真实硬件</td>
+                    </tr>
+                    <tr>
+                        <td><strong>环境测试</strong></td>
+                        <td>高低温、湿度、振动</td>
+                        <td>工业设备、车载电子</td>
+                    </tr>
+                    <tr>
+                        <td><strong>EMC测试</strong></td>
+                        <td>电磁兼容性</td>
+                        <td>所有电子产品认证必需</td>
+                    </tr>
+                    <tr>
+                        <td><strong>功耗测试</strong></td>
+                        <td>各模式下功耗</td>
+                        <td>电池供电设备</td>
+                    </tr>
+                    <tr>
+                        <td><strong>老化测试</strong></td>
+                        <td>长时间运行稳定性</td>
+                        <td>72小时/1000小时不间断</td>
+                    </tr>
+                </table>
+
+                <div class="quiz-box">
+                    <div class="quiz-question">🎯 测验：一个嵌入式产品要做"72小时老化测试"，主要是为了发现什么问题？</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">A. 功能是否正确</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">B. 内存泄漏、资源耗尽</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">C. 界面是否美观</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">D. 编译是否通过</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第五部分：测试规划 -->
+            <section id="planning">
+                <h2>五、测试规划</h2>
+
+                <div class="philosophy-box">
+                    <blockquote>
+                        "计划赶不上变化，但没有计划就没有变化的基准。"
+                    </blockquote>
+                    <div class="author">— 测试计划是质量保证的蓝图</div>
+                </div>
+
+                <h3>V模型：开发与测试的对应关系</h3>
+
+                <div class="v-model">
+                    <div class="v-model-diagram">
+                        <div class="v-row">
+                            <div class="v-box v-left">需求分析</div>
+                            <div class="v-connector">←————————→</div>
+                            <div class="v-box v-right">验收测试</div>
+                        </div>
+                        <div class="v-row" style="width: 85%;">
+                            <div class="v-box v-left">概要设计</div>
+                            <div class="v-connector">←——————→</div>
+                            <div class="v-box v-right">系统测试</div>
+                        </div>
+                        <div class="v-row" style="width: 70%;">
+                            <div class="v-box v-left">详细设计</div>
+                            <div class="v-connector">←————→</div>
+                            <div class="v-box v-right">集成测试</div>
+                        </div>
+                        <div class="v-row" style="width: 55%;">
+                            <div class="v-box v-left">编码</div>
+                            <div class="v-connector">←——→</div>
+                            <div class="v-box v-right">单元测试</div>
+                        </div>
+                    </div>
+                    <p style="text-align: center; margin-top: 20px; color: #666;">
+                        左边每个阶段的产出，都对应右边一种测试类型
+                    </p>
+                </div>
+
+                <h3>测试规划要素</h3>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-title">1. 测试范围（Scope）</div>
+                            <p>测什么？不测什么？边界在哪里？</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-title">2. 测试策略（Strategy）</div>
+                            <p>用什么方法测？手动/自动比例？重点在哪？</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-title">3. 测试用例（Test Cases）</div>
+                            <p>具体的测试步骤、输入数据、预期结果</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-title">4. 测试环境（Environment）</div>
+                            <p>硬件平台、软件版本、测试工具</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-title">5. 进入/退出标准（Entry/Exit Criteria）</div>
+                            <p>什么条件开始测试？什么条件算测试通过？</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-title">6. 风险评估（Risk）</div>
+                            <p>哪些模块风险高？资源不够怎么取舍？</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <p><strong>📋 测试用例设计原则：</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>等价类划分：</strong>把输入分成若干类，每类取一个代表</li>
+                        <li><strong>边界值分析：</strong>测试边界条件（0, 1, max, max+1）</li>
+                        <li><strong>错误推测：</strong>根据经验预测可能出错的地方</li>
+                        <li><strong>场景法：</strong>模拟用户真实使用流程</li>
+                    </ul>
+                </div>
+
+                <div class="warning-card">
+                    <p><strong>🎯 记住：</strong>好的测试用例能<strong>用20%的用例发现80%的Bug</strong>（二八定律）。测试不是越多越好，而是越精准越好。</p>
+                </div>
+            </section>
+
+            <!-- 第六部分：测试专业性 -->
+            <section id="professionalism">
+                <h2>六、测试的专业性</h2>
+
+                <div class="philosophy-box">
+                    <blockquote>
+                        "破坏比建设更需要创造力。"
+                    </blockquote>
+                    <div class="author">— 优秀的测试工程师是"有建设性的破坏者"</div>
+                </div>
+
+                <h3>测试工程师 ≠ "点点点"</h3>
+
+                <div class="danger-card">
+                    <p><strong>❌ 误解：</strong>"测试就是找人点一点，谁都能做"</p>
+                    <p style="margin-top: 10px;"><strong>✅ 真相：</strong>专业测试需要系统思维、技术深度、创造力</p>
+                </div>
+
+                <h3>测试工程师的专业技能</h3>
+
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div style="font-size: 2em; text-align: center; margin-bottom: 10px;">🧠</div>
+                        <h4 style="color: #6c5ce7;">系统思维</h4>
+                        <p>理解整个系统架构，知道哪里容易出问题</p>
+                    </div>
+                    <div class="command-card">
+                        <div style="font-size: 2em; text-align: center; margin-bottom: 10px;">💻</div>
+                        <h4 style="color: #6c5ce7;">编程能力</h4>
+                        <p>编写自动化测试脚本、测试工具</p>
+                    </div>
+                    <div class="command-card">
+                        <div style="font-size: 2em; text-align: center; margin-bottom: 10px;">🔍</div>
+                        <h4 style="color: #6c5ce7;">分析能力</h4>
+                        <p>从现象追溯根因，精准定位问题</p>
+                    </div>
+                    <div class="command-card">
+                        <div style="font-size: 2em; text-align: center; margin-bottom: 10px;">📝</div>
+                        <h4 style="color: #6c5ce7;">文档能力</h4>
+                        <p>测试报告清晰、Bug描述准确可复现</p>
+                    </div>
+                </div>
+
+                <h3>嵌入式测试工程师的额外要求</h3>
+
+                <table class="data-table">
+                    <tr>
+                        <th>技能领域</th>
+                        <th>具体要求</th>
+                    </tr>
+                    <tr>
+                        <td>硬件基础</td>
+                        <td>看懂原理图、会用示波器/逻辑分析仪</td>
+                    </tr>
+                    <tr>
+                        <td>通信协议</td>
+                        <td>UART、SPI、I2C、CAN、以太网</td>
+                    </tr>
+                    <tr>
+                        <td>操作系统</td>
+                        <td>Linux内核机制、RTOS原理</td>
+                    </tr>
+                    <tr>
+                        <td>脚本语言</td>
+                        <td>Python、Shell、Lua</td>
+                    </tr>
+                    <tr>
+                        <td>测试框架</td>
+                        <td>Robot Framework、pytest</td>
+                    </tr>
+                    <tr>
+                        <td>CI/CD</td>
+                        <td>Jenkins、GitLab CI、自动化流水线</td>
+                    </tr>
+                </table>
+
+                <div class="success-card">
+                    <p><strong>💼 职业发展：</strong></p>
+                    <p style="margin-top: 10px;">测试工程师 → 高级测试工程师 → 测试架构师 → 质量总监</p>
+                    <p style="margin-top: 10px;">或转型：测试开发工程师、DevOps工程师、技术经理</p>
+                </div>
+
+                <div class="quiz-box">
+                    <div class="quiz-question">🤔 讨论：为什么说"开发人员不应该测试自己的代码"？</div>
+                    <button onclick="toggleAnswer('self-test')">展开讨论</button>
+                    <div id="self-test" class="hidden" style="margin-top: 15px; background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                        <ul style="margin-left: 20px;">
+                            <li><strong>思维定式：</strong>写代码时的思路会影响测试，盲区相同</li>
+                            <li><strong>心理因素：</strong>不自觉地"保护"自己的代码</li>
+                            <li><strong>视角不同：</strong>开发关注"能不能用"，测试关注"怎么会出错"</li>
+                            <li><strong>专业分工：</strong>破坏者和建设者需要不同的思维模式</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>但是：</strong>单元测试仍应由开发者自己写——这是对自己代码负责。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 课后总结 -->
+            <section>
+                <h2>📝 今日总结</h2>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%;"></div>
+                </div>
+
+                <div class="command-grid">
+                    <div class="info-card" style="border-color: #d63031;">
+                        <h4 style="color: #d63031;">开发流程</h4>
+                        <p>需求→设计→开发→测试→发布<br/>嵌入式特殊性：软硬协同、资源受限、难以更新</p>
+                    </div>
+                    <div class="info-card" style="border-color: #e17055;">
+                        <h4 style="color: #e17055;">测试重要性</h4>
+                        <p>Bug越晚发现成本越高<br/>发布后修复成本是开发期的150倍</p>
+                    </div>
+                    <div class="info-card" style="border-color: #0984e3;">
+                        <h4 style="color: #0984e3;">测试投入</h4>
+                        <p>行业平均30-35%<br/>安全攸关领域高达50-60%</p>
+                    </div>
+                    <div class="info-card" style="border-color: #00b894;">
+                        <h4 style="color: #00b894;">测试手段</h4>
+                        <p>单元→集成→系统→验收<br/>嵌入式特有：HIL、环境、EMC、老化</p>
+                    </div>
+                </div>
+
+                <div class="philosophy-box" style="margin-top: 30px;">
+                    <blockquote>
+                        "质量是免费的，但只有那些愿意为之付出努力的人才能得到它。"
+                    </blockquote>
+                    <div class="author">— Philip Crosby《质量免费》</div>
+                </div>
+            </section>
+
+            <!-- 课后作业 -->
+            <section>
+                <h2>📚 思考与作业</h2>
+
+                <div class="info-card">
+                    <h4 style="margin-top: 0;">必做思考题：</h4>
+                    <ol style="margin-left: 20px; margin-top: 10px;">
+                        <li>如果你负责一款智能门锁的测试，你会设计哪些测试场景？</li>
+                        <li>为什么说"测试不能证明软件没有Bug，只能证明存在Bug"？</li>
+                        <li>假设项目时间紧张，只能做一部分测试，你会优先测试哪些功能？为什么？</li>
+                    </ol>
+                </div>
+
+                <div class="info-card" style="border-color: #6c5ce7;">
+                    <h4 style="margin-top: 0; color: #6c5ce7;">拓展阅读：</h4>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>《软件测试的艺术》- Glenford Myers</li>
+                        <li>搜索了解：丰田刹车门事件完整始末</li>
+                        <li>了解：什么是ISO 26262（汽车功能安全标准）</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <h3 style="margin-bottom: 15px;">下节课预告</h3>
+            <p style="font-size: 1.1em;">Linux权限管理 & 嵌入式开发环境搭建</p>
+            <p style="margin-top: 20px; opacity: 0.8;">海巴巴Linux培训班 | 质量是设计出来的，更是测试出来的</p>
+            <div class="student-names" style="margin-top: 15px;">
+                <span class="student-tag">王子臻</span>
+                <span class="student-tag">钱辰宇</span>
+                <span class="student-tag">钱姿妤</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        function toggleAnswer(id) {
+            const element = document.getElementById(id);
+            element.classList.toggle('hidden');
+        }
+
+        function checkQuiz(element, isCorrect) {
+            const options = element.parentElement.children;
+            for (let option of options) {
+                option.classList.remove('correct', 'wrong');
+                option.style.pointerEvents = 'none';
+            }
+
+            if (isCorrect) {
+                element.classList.add('correct');
+                setTimeout(() => alert('✅ 正确！老化测试主要发现长时间运行才会暴露的问题，如内存泄漏、资源耗尽等。'), 200);
+            } else {
+                element.classList.add('wrong');
+                for (let option of options) {
+                    if (option.onclick && option.onclick.toString().includes('true')) {
+                        option.classList.add('correct');
+                    }
+                }
+                setTimeout(() => alert('❌ 再想想！老化测试是为了发现长期运行的稳定性问题。'), 200);
+            }
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const href = this.getAttribute('href').split(' ')[0];
+                const target = document.querySelector(href);
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // 页面加载动画
+        window.addEventListener('load', () => {
+            const sections = document.querySelectorAll('section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            sections.forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = 'all 0.5s ease-out';
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
