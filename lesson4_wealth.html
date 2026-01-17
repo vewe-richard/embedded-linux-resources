@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>财富自由的数学与现实 - 海巴巴Linux培训班</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #333;
+            line-height: 1.8;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%);
+            color: white;
+            padding: 35px;
+            text-align: center;
+        }
+        header h1 { font-size: 2.2em; margin-bottom: 10px; }
+        header p { font-size: 1.1em; opacity: 0.95; }
+        .content { padding: 35px; }
+        section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #e74c3c;
+        }
+        h2 { color: #c0392b; font-size: 1.6em; margin-bottom: 20px; }
+        h3 { color: #555; font-size: 1.3em; margin: 20px 0 12px 0; }
+
+        .math-box {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 25px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
+        .math-box .highlight { color: #f1fa8c; font-size: 1.3em; }
+        .math-box .comment { color: #6a9955; }
+
+        .reality-check {
+            background: #fff5f5;
+            border: 2px solid #e74c3c;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .reality-check h4 { color: #c0392b; margin-bottom: 12px; }
+
+        .discuss-box {
+            background: #fff9e6;
+            border: 2px dashed #f39c12;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .discuss-box h4 { color: #e67e22; margin-bottom: 12px; }
+        .discuss-box li { margin-bottom: 10px; color: #555; }
+        .discuss-box .blank {
+            display: block;
+            border-bottom: 1px dashed #999;
+            margin: 8px 0;
+            min-height: 24px;
+        }
+
+        .pyramid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 25px 0;
+        }
+        .pyramid-level {
+            padding: 12px 25px;
+            margin: 3px 0;
+            border-radius: 5px;
+            text-align: center;
+            color: white;
+            font-weight: 600;
+        }
+        .pyramid-level:nth-child(1) { background: #9b59b6; width: 50%; }
+        .pyramid-level:nth-child(2) { background: #3498db; width: 65%; }
+        .pyramid-level:nth-child(3) { background: #27ae60; width: 80%; }
+        .pyramid-level:nth-child(4) { background: #f39c12; width: 95%; }
+        .pyramid-level:nth-child(5) { background: #e74c3c; width: 100%; }
+
+        .timeline-simple {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .timeline-node {
+            text-align: center;
+            flex: 1;
+            min-width: 80px;
+        }
+        .timeline-node .salary { font-size: 1.4em; font-weight: bold; color: #27ae60; }
+        .timeline-node .label { font-size: 0.85em; color: #666; }
+        .timeline-arrow { font-size: 1.5em; color: #ccc; }
+
+        .cost-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .cost-item {
+            background: white;
+            padding: 18px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .cost-item .icon { font-size: 2em; margin-bottom: 8px; }
+        .cost-item .name { font-weight: 600; color: #333; }
+        .cost-item .note { font-size: 0.85em; color: #888; margin-top: 5px; }
+
+        .quote-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .quote-box p { font-size: 1.25em; font-style: italic; }
+        .quote-box .author { margin-top: 10px; opacity: 0.85; }
+
+        .key-point {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .compare-table th {
+            background: #34495e;
+            color: white;
+            padding: 12px;
+        }
+        .compare-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+
+        footer {
+            background: #34495e;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        .student-names {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .student-tag {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>财富自由的数学与现实</h1>
+            <p>第4讲 补充 - 一道需要你自己算的人生题</p>
+        </header>
+
+        <div class="content">
+            <!-- 一、理想的数学 -->
+            <section>
+                <h2>一、理想的数学</h2>
+
+                <div class="math-box">
+                    <span class="comment">// 假设：程序员月薪 5万</span><br/><br/>
+                    年收入 = 50000 × 12 = <span class="highlight">60万</span><br/><br/>
+                    <span class="comment">// 农村低保：约 1000元/月 = 1.2万/年</span><br/><br/>
+                    60万 ÷ 1.2万 = <span class="highlight">50人</span><br/><br/>
+                    <span class="comment">// 一个程序员一年的收入，可以覆盖50个人一年的低保</span><br/>
+                    <span class="comment">// 或者说，工作1年，可以"低保式生存"50年</span>
+                </div>
+
+                <div class="quote-box">
+                    <p>"看起来，财富自由很简单？"</p>
+                </div>
+
+                <div class="discuss-box">
+                    <h4>讨论：这个算法有什么问题？</h4>
+                    <ul>
+                        <li><span class="blank"></span></li>
+                        <li><span class="blank"></span></li>
+                        <li><span class="blank"></span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 二、现实的骨感 -->
+            <section>
+                <h2>二、现实的骨感</h2>
+
+                <h3>A. 收入曲线：从5千到5万的漫长之路</h3>
+
+                <div class="timeline-simple">
+                    <div class="timeline-node">
+                        <div class="salary">5K</div>
+                        <div class="label">实习/应届</div>
+                    </div>
+                    <div class="timeline-arrow">→</div>
+                    <div class="timeline-node">
+                        <div class="salary">10K</div>
+                        <div class="label">1-2年</div>
+                    </div>
+                    <div class="timeline-arrow">→</div>
+                    <div class="timeline-node">
+                        <div class="salary">20K</div>
+                        <div class="label">3-5年</div>
+                    </div>
+                    <div class="timeline-arrow">→</div>
+                    <div class="timeline-node">
+                        <div class="salary">30K+</div>
+                        <div class="label">5-8年</div>
+                    </div>
+                    <div class="timeline-arrow">→</div>
+                    <div class="timeline-node">
+                        <div class="salary">50K?</div>
+                        <div class="label">少数人</div>
+                    </div>
+                </div>
+
+                <div class="discuss-box">
+                    <h4>讨论：收入增长的现实</h4>
+                    <ul>
+                        <li>不是每个人都能到5万</li>
+                        <li>需要多少年才能达到？</li>
+                        <li>中间会遇到什么瓶颈？</li>
+                        <li><span class="blank"></span></li>
+                    </ul>
+                </div>
+
+                <h3>B. 行业门槛的变化</h3>
+
+                <div class="compare-table">
+                    <tr>
+                        <th>时代</th>
+                        <th>门槛</th>
+                        <th>称呼</th>
+                        <th>机会</th>
+                    </tr>
+                    <tr>
+                        <td>2010年代</td>
+                        <td>低</td>
+                        <td>"码农"</td>
+                        <td>遍地黄金</td>
+                    </tr>
+                    <tr>
+                        <td>2020年代</td>
+                        <td>中</td>
+                        <td>程序员</td>
+                        <td>竞争加剧</td>
+                    </tr>
+                    <tr>
+                        <td>未来</td>
+                        <td>高</td>
+                        <td>才俊？</td>
+                        <td>???</td>
+                    </tr>
+                </div>
+
+                <div class="discuss-box">
+                    <h4>讨论：行业变化意味着什么？</h4>
+                    <ul>
+                        <li>AI会取代哪些程序员？</li>
+                        <li>什么样的人会更有价值？</li>
+                        <li><span class="blank"></span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 三、真实的支出 -->
+            <section>
+                <h2>三、城市生活的真实成本</h2>
+
+                <p style="margin-bottom: 15px;">农村低保1000元能活，但城市里...</p>
+
+                <div class="cost-grid">
+                    <div class="cost-item">
+                        <div class="icon">🏠</div>
+                        <div class="name">房租/房贷</div>
+                        <div class="note">一线城市？</div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="icon">🍜</div>
+                        <div class="name">饮食</div>
+                        <div class="note">外卖/食堂</div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="icon">🏥</div>
+                        <div class="name">医疗</div>
+                        <div class="note">一场大病？</div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="icon">👶</div>
+                        <div class="name">养育</div>
+                        <div class="note">教育成本</div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="icon">👴</div>
+                        <div class="name">养老</div>
+                        <div class="note">父母/自己</div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="icon">📱</div>
+                        <div class="name">生活</div>
+                        <div class="note">通勤/社交</div>
+                    </div>
+                </div>
+
+                <div class="reality-check">
+                    <h4>算一笔账（一线城市单身）</h4>
+                    <p>房租 _____ + 餐饮 _____ + 其他 _____ = 月支出 _____</p>
+                    <p style="margin-top: 10px;">结论：月薪多少才能"活下来"？多少才能"存下钱"？</p>
+                </div>
+
+                <div class="discuss-box">
+                    <h4>讨论：生活成本的城市差异</h4>
+                    <ul>
+                        <li>一线 vs 二线 vs 老家</li>
+                        <li>高薪但高消费 vs 低薪但低消费</li>
+                        <li><span class="blank"></span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 四、精神需求 -->
+            <section>
+                <h2>四、钱之外的东西</h2>
+
+                <div class="quote-box">
+                    <p>"人不能只靠面包活着"</p>
+                </div>
+
+                <div class="pyramid">
+                    <div class="pyramid-level">自我实现</div>
+                    <div class="pyramid-level">尊重需求</div>
+                    <div class="pyramid-level">社交需求</div>
+                    <div class="pyramid-level">安全需求</div>
+                    <div class="pyramid-level">生理需求（低保能覆盖的）</div>
+                </div>
+
+                <div class="discuss-box">
+                    <h4>讨论：精神层面的"成本"</h4>
+                    <ul>
+                        <li>旅行、爱好、体验</li>
+                        <li>有质量的社交</li>
+                        <li>学习和成长的投入</li>
+                        <li>心理健康的维护</li>
+                        <li>自由选择的权利</li>
+                        <li><span class="blank"></span></li>
+                    </ul>
+                </div>
+
+                <div class="key-point">
+                    <strong>思考：</strong>财富自由的真正定义是什么？是"饿不死"还是"活得好"？
+                </div>
+            </section>
+
+            <!-- 五、重新定义 -->
+            <section>
+                <h2>五、什么才是"财富自由"？</h2>
+
+                <div class="compare-table">
+                    <tr>
+                        <th>层次</th>
+                        <th>状态</th>
+                        <th>大概需要</th>
+                    </tr>
+                    <tr>
+                        <td>生存自由</td>
+                        <td>不工作也饿不死</td>
+                        <td>???</td>
+                    </tr>
+                    <tr>
+                        <td>生活自由</td>
+                        <td>不用为日常开支焦虑</td>
+                        <td>???</td>
+                    </tr>
+                    <tr>
+                        <td>选择自由</td>
+                        <td>可以做自己想做的事</td>
+                        <td>???</td>
+                    </tr>
+                    <tr>
+                        <td>精神自由</td>
+                        <td>不被金钱绑架</td>
+                        <td>心态？</td>
+                    </tr>
+                </div>
+
+                <div class="discuss-box">
+                    <h4>讨论：你追求的是哪一层？</h4>
+                    <ul>
+                        <li><span class="blank"></span></li>
+                        <li><span class="blank"></span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 六、给年轻人的话 -->
+            <section>
+                <h2>六、Richard的话</h2>
+
+                <div class="discuss-box" style="border-color: #3498db; background: #f0f8ff;">
+                    <h4 style="color: #2980b9;">留给讲师发挥</h4>
+                    <ul>
+                        <li><span class="blank"></span></li>
+                        <li><span class="blank"></span></li>
+                        <li><span class="blank"></span></li>
+                        <li><span class="blank"></span></li>
+                        <li><span class="blank"></span></li>
+                    </ul>
+                </div>
+
+                <div class="key-point">
+                    <strong>核心观点：</strong>（待填写）
+                </div>
+            </section>
+
+            <!-- 总结 -->
+            <section style="border-color: #27ae60;">
+                <h2>小结</h2>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div class="cost-item">
+                        <div class="icon">🧮</div>
+                        <div class="name">数学很美好</div>
+                        <div class="note">但要看清假设</div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="icon">📈</div>
+                        <div class="name">收入要成长</div>
+                        <div class="note">不是一步到位</div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="icon">💸</div>
+                        <div class="name">支出要清醒</div>
+                        <div class="note">城市 ≠ 农村</div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="icon">🧠</div>
+                        <div class="name">精神也是成本</div>
+                        <div class="note">不只是活着</div>
+                    </div>
+                </div>
+
+                <div class="quote-box" style="margin-top: 25px; background: linear-gradient(135deg, #2c3e50 0%, #000000 100%);">
+                    <p>"清醒地认识现实，积极地创造未来"</p>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <p>海巴巴Linux培训班 | 第4讲 补充</p>
+            <div class="student-names">
+                <span class="student-tag">王子臻</span>
+                <span class="student-tag">钱辰宇</span>
+                <span class="student-tag">钱姿妤</span>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
